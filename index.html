@@ -52,10 +52,21 @@
                         <button type="submit" class="submit-button">기록 저장</button>
                     </form>
                 </div>
+                <button id="generate-essay-button" class="action-button">AI 에세이 생성</button>
                 <div id="entries-container"></div>
             </main>
         </section>
     </div>
+
+    <div id="essay-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>생성된 에세이</h2>
+            <div id="essay-output" contenteditable="true"></div>
+            <button id="save-essay-button" class="submit-button">에세이 저장</button>
+        </div>
+    </div>
+
     <script src="main.js"></script>
 </body>
 </html>
