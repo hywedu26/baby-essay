@@ -1,1 +1,151 @@
-/* Add styles here */
+:root {
+    --primary-color: #6c63ff;
+    --light-grey: #f2f2f2;
+    --dark-grey: #333;
+    --text-color: #555;
+    --font-family: 'Pretendard', sans-serif;
+}
+
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+body {
+    font-family: var(--font-family);
+    margin: 0;
+    background-color: var(--light-grey);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+#app {
+    width: 100%;
+    max-width: 420px;
+    margin: 2rem;
+}
+
+.screen {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Login Screen */
+.login-container {
+    padding: 3rem 2.5rem;
+    text-align: center;
+}
+
+.login-container h1 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    font-weight: 900;
+}
+
+.login-container p {
+    margin-bottom: 2rem;
+    color: var(--text-color);
+    font-size: 1.1rem;
+}
+
+#login-form .input-group {
+    text-align: left;
+    margin-bottom: 1.5rem;
+}
+
+#login-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--dark-grey);
+}
+
+#login-form input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+#login-form input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+}
+
+.login-button {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    box-shadow: 0 4px 15px rgba(108, 99, 255, 0.4);
+}
+
+.login-button:hover {
+    background-color: #5a52e0;
+}
+
+.login-button:active {
+    transform: translateY(2px);
+}
+
+/* Main Screen */
+header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-greeting {
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.profile-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid white;
+    margin-right: 1rem;
+    object-fit: cover;
+}
+
+main {
+    padding: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    #app {
+        margin: 1rem;
+    }
+    .login-container {
+        padding: 2rem 1.5rem;
+    }
+    .login-container h1 {
+        font-size: 2rem;
+    }
+}
