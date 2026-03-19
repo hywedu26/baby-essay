@@ -34,7 +34,6 @@ function createPrompt(entries) {
 // POST 요청을 처리하는 메인 핸들러
 export async function onRequestPost({ request, env }) {
     const GEMINI_API_KEY = env.GEMINI_API_KEY;
-    // [Final Fix] Using the latest recommended model as the previous one (gemini-pro) was not found.
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
@@ -56,9 +55,8 @@ export async function onRequestPost({ request, env }) {
             },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
-                 generationConfig: {
-                    responseMimeType: "text/html",
-                }
+                // [Final Fix] Removed the unsupported 'generationConfig' for 'text/html'.
+                // The prompt already instructs the AI to format the output with HTML tags within a plain text response.
             }),
         });
 
@@ -80,7 +78,6 @@ export async function onRequestPost({ request, env }) {
              throw new Error("AI 응답에서 예상된 콘텐츠 구조를 찾을 수 없습니다.");
         }
         
-        // The response is now expected to be HTML directly
         const essay = data.candidates[0].content.parts[0].text;
 
         return new Response(JSON.stringify({ essay }), {
