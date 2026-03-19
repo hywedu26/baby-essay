@@ -1,22 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Screens and Forms
     const loginScreen = document.getElementById('login-screen');
     const mainScreen = document.getElementById('main-screen');
     const loginForm = document.getElementById('login-form');
     const entryForm = document.getElementById('entry-form');
+
+    // User Info
     const userIdSpan = document.getElementById('user-id');
     const profilePicture = document.querySelector('.profile-picture');
+
+    // Entry Form Elements
     const entryDate = document.getElementById('entry-date');
     const entryPhoto = document.getElementById('entry-photo');
     const photoPreview = document.getElementById('photo-preview');
     const entriesContainer = document.getElementById('entries-container');
+
+    // Essay Modal Elements
     const generateEssayButton = document.getElementById('generate-essay-button');
     const essayModal = document.getElementById('essay-modal');
     const closeButton = document.querySelector('.close-button');
     const essayOutput = document.getElementById('essay-output');
-    // const saveEssayButton = document.getElementById('final-save-button'); // [FIX] Temporarily disabled to prevent crash
+    const saveEssayButton = document.getElementById('final-save-button');
 
+    // --- Initialization ---
     entryDate.valueAsDate = new Date();
 
+    // --- Event Listeners ---
+
+    // Login Handler
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const username = e.target.username.value;
@@ -24,12 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
             loginScreen.classList.add('hidden');
             mainScreen.classList.remove('hidden');
             userIdSpan.textContent = username;
+            // Update to a cuter avatar style to match the 'Babily' concept
             profilePicture.src = `https://api.dicebear.com/8.x/miniavs/svg?seed=${username}`;
         } else {
             alert('아이디를 입력해주세요.');
         }
     });
 
+    // Photo Preview
     entryPhoto.addEventListener('change', () => {
         const file = entryPhoto.files[0];
         if (file) {
@@ -45,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Save Entry
     entryForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const date = entryDate.value;
@@ -60,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
         entryDate.valueAsDate = new Date();
     });
 
+    // API-based Essay Generation
     generateEssayButton.addEventListener('click', async () => {
         const entryElements = entriesContainer.querySelectorAll('.entry');
         if (entryElements.length < 2) {
@@ -96,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Modal Controls
     closeButton.addEventListener('click', () => essayModal.classList.add('hidden'));
     essayModal.addEventListener('click', (e) => {
         if (e.target === essayModal) {
@@ -103,12 +119,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // [FIX] Temporarily disabled to prevent crash
-    // saveEssayButton.addEventListener('click', () => {
-    //     alert('에세이가 저장되었습니다! (이 기능은 곧 구현될 예정입니다.)');
-    //     essayModal.classList.add('hidden');
-    // });
+    // Save Essay Button Handler
+    saveEssayButton.addEventListener('click', () => {
+        alert('에세이가 저장되었습니다! (이 기능은 곧 구현될 예정입니다.)');
+        essayModal.classList.add('hidden');
+    });
 
+    // --- DOM Manipulation Functions ---
     function addEntryToDOM(date, text, photoSrc) {
         const entryElement = document.createElement('div');
         entryElement.classList.add('entry');
