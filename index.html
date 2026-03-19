@@ -3,31 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>육아 에세이 - DEBUG MODE</title>
-    
-    <!-- Original stylesheet is disabled for debugging -->
-    <!-- <link rel="stylesheet" href="style.css"> -->
-    
-    <!-- Debug stylesheet is now active -->
-    <link rel="stylesheet" href="debug.css">
-
+    <title>아기 성장 에세이</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app">
         <section id="login-screen" class="screen">
             <div class="login-container">
-                <h1>육아 에세이 (디버그 모드)</h1>
-                <p>이 화면에서 아이디와 비밀번호 입력이 가능한지 확인해주세요.</p>
+                <h1>아기 성장 에세이</h1>
+                <p>소중한 순간들을 기록하고, AI와 함께 특별한 이야기로 만들어보세요.</p>
                 <form id="login-form">
                     <div class="input-group">
                         <label for="username">아이디</label>
-                        <input type="text" id="username" name="username" required>
+                        <input type="text" id="username" name="username" required placeholder="사용자 아이디를 입력하세요">
                     </div>
                     <div class="input-group">
                         <label for="password">비밀번호</label>
-                        <input type="password" id="password" name="password" required>
+                        <input type="password" id="password" name="password" required placeholder="비밀번호를 입력하세요">
                     </div>
-                    <button type="submit" class="login-button">로그인</button>
+                    <button type="submit" class="login-button button button-primary">로그인</button>
                 </form>
             </div>
         </section>
@@ -36,7 +30,7 @@
             <header>
                 <div class="profile-greeting">
                     <img src="" alt="프로필 사진" class="profile-picture">
-                    <span>환영합니다, <span id="user-id"></span>님!</span>
+                    <span><span id="user-id"></span>님, 반가워요!</span>
                 </div>
             </header>
             <main>
@@ -48,23 +42,31 @@
                         </div>
                         <div class="form-group">
                             <label for="entry-text">오늘의 기록</label>
-                            <textarea id="entry-text" name="entry-text" rows="4" placeholder="어떤 특별한 순간이 있었나요?"></textarea>
+                            <textarea id="entry-text" name="entry-text" rows="5" placeholder="어떤 특별한 순간이 있었나요?"></textarea>
                         </div>
                         <div class="form-group">
                             <label for="entry-photo">사진 추가</label>
                             <input type="file" id="entry-photo" name="entry-photo" accept="image/*">
-                            <img id="photo-preview" src="" alt="사진 미리보기" class="hidden">
+                            <img id="photo-preview" src="#" alt="사진 미리보기" class="hidden">
                         </div>
-                        <button type="submit" class="submit-button">기록 저장</button>
+                        <button type="submit" class="submit-button">기록 저장하기</button>
                     </form>
                 </div>
-                <button id="generate-essay-button" class="action-button">AI 에세이 생성</button>
+                <button id="generate-essay-button" class="action-button">AI 에세이 만들기</button>
                 <div id="entries-container"></div>
             </main>
         </section>
-    </div>
 
-    <!-- MODAL HAS BEEN TEMPORARILY REMOVED FOR DEBUGGING -->
+        <!-- Essay Generation Modal -->
+        <div id="essay-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>AI 육아 에세이</h2>
+                <div id="essay-output"><p>AI가 아가의 소중한 기록으로 예쁜 글을 만들고 있어요. 잠시만 기다려주세요...</p></div>
+                <button id="final-save-button" class="button button-primary">이 에세이 저장하기</button>
+            </div>
+        </div>
+    </div>
 
     <script src="main.js"></script>
 </body>

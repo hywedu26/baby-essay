@@ -1,4 +1,4 @@
-/* === Babily-Inspired Design Overhaul: Cute & Friendly === */
+/* === Babily-Inspired Design Overhaul: Cute & Friendly (Corrected) === */
 
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&display=swap');
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -177,7 +177,7 @@ main {
     margin-bottom: 1.5rem;
 }
 
-/* Buttons */
+/* Generic Button Styles */
 .button {
     width: 100%;
     padding: 1.2rem;
@@ -204,6 +204,39 @@ main {
 .button-primary:active {
     transform: translateY(0) scale(1);
 }
+
+/* Applying button styles to specific classes */
+.login-button, .submit-button, .action-button, #final-save-button {
+    /* These classes will now inherit the .button and .button-primary look and feel */
+    width: 100%;
+    padding: 1.2rem;
+    border: none;
+    border-radius: 99px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    font-family: var(--font-family-display);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 15px var(--primary-glow);
+}
+
+.login-button:hover, .submit-button:hover, .action-button:hover, #final-save-button:hover,
+.login-button:focus, .submit-button:focus, .action-button:focus, #final-save-button:focus {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 25px var(--primary-glow);
+}
+
+.login-button:active, .submit-button:active, .action-button:active, #final-save-button:active {
+    transform: translateY(0) scale(1);
+}
+
+/* Add margin back to the necessary buttons */
+.action-button, .submit-button {
+    margin-bottom: 1.5rem;
+}
+
 
 /* Saved Entries */
 #entries-container {
@@ -335,17 +368,6 @@ main {
     border-radius: 16px;
     object-fit: cover;
 }
-
-/* Class Mapping from HTML */
-/* The existing HTML classes will now use the new button styles */
-.login-button, .submit-button, .action-button, #final-save-button {
-    composes: button button-primary;
-}
-
-.action-button, .submit-button {
-    margin-bottom: 1.5rem;
-}
-
 
 /* Responsive */
 @media (max-width: 480px) {
