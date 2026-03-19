@@ -34,8 +34,8 @@ function createPrompt(entries) {
 // POST 요청을 처리하는 메인 핸들러
 export async function onRequestPost({ request, env }) {
     const GEMINI_API_KEY = env.GEMINI_API_KEY;
-    // [FIX] Use stable v1 API and a specific model version to prevent 404 errors.
-    const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key=${GEMINI_API_KEY}`;
+    // [FIX] Reverted to the correct `v1beta` path and updated to the latest Gemini model `gemini-1.5-flash-latest`.
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
         const { entries } = await request.json();
@@ -62,10 +62,17 @@ export async function onRequestPost({ request, env }) {
         if (!apiResponse.ok) {
             const errorBody = await apiResponse.text();
             console.error("Google AI API Error Body:", errorBody);
-            throw new Error(`Google AI API 오류: ${apiResponse.status} ${apiResponse.statusText}`);
+            // Provide a more specific error message back to the client
+            throw new Error(`Google AI API 오류: ${apiResponse.status} ${apiResponse.statusText}. 응답: ${errorBody}`);
         }
 
         const data = await apiResponse.json();
+
+        // Defensive check for candidates and content parts
+        if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
+             throw new Error("AI 응답에서 예상된 콘텐츠 구조를 찾을 수 없습니다.");
+        }
+        
         const essay = data.candidates[0].content.parts[0].text;
 
         return new Response(JSON.stringify({ essay }), {
