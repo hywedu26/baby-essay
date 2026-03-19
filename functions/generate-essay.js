@@ -5,7 +5,6 @@
 
 // AI에게 전달할 프롬프트를 생성하는 함수
 function createPrompt(entries) {
-    // 기록들을 시간 순서대로 정렬
     const sortedEntries = entries.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     let recordsText = '';
@@ -13,7 +12,6 @@ function createPrompt(entries) {
         recordsText += `- ${entry.date}: ${entry.text}\n`;
     });
 
-    // Gemini AI에게 역할을 부여하고, 명확한 지시를 내리는 프롬프트
     return `
         당신은 아이를 세상에서 가장 사랑하는 부모입니다. 당신의 임무는 아래에 있는 육아 기록들을 바탕으로, 아이에게 보내는 한 편의 따뜻하고 감성적인 에세이를 작성하는 것입니다.
 
@@ -35,8 +33,9 @@ function createPrompt(entries) {
 
 // POST 요청을 처리하는 메인 핸들러
 export async function onRequestPost({ request, env }) {
-    const GEMINI_API_KEY = env.GEMINI_API_KEY; // Cloudflare 환경 변수에서 API 키 로드
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+    const GEMINI_API_KEY = env.GEMINI_API_KEY;
+    // [FIX] Use stable v1 API and a specific model version to prevent 404 errors.
+    const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
         const { entries } = await request.json();
@@ -50,7 +49,6 @@ export async function onRequestPost({ request, env }) {
 
         const prompt = createPrompt(entries);
 
-        // Google Gemini API 요청
         const apiResponse = await fetch(API_URL, {
             method: 'POST',
             headers: {
@@ -63,13 +61,11 @@ export async function onRequestPost({ request, env }) {
 
         if (!apiResponse.ok) {
             const errorBody = await apiResponse.text();
-            console.error("API Error:", errorBody);
+            console.error("Google AI API Error Body:", errorBody);
             throw new Error(`Google AI API 오류: ${apiResponse.status} ${apiResponse.statusText}`);
         }
 
         const data = await apiResponse.json();
-
-        // AI가 생성한 텍스트 추출
         const essay = data.candidates[0].content.parts[0].text;
 
         return new Response(JSON.stringify({ essay }), {
