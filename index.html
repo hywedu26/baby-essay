@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>아기 성장 에세이</title>
-    <link rel="stylesheet" href="style.css?v=1716183353">
+    <link rel="stylesheet" href="style.css?v=1716184000">
 </head>
 <body>
     <div id="app">
@@ -34,26 +34,42 @@
                 </div>
             </header>
             <main>
-                <div id="entry-form-container">
-                    <form id="entry-form">
-                        <div class="form-group">
-                            <label for="entry-date">날짜</label>
-                            <input type="date" id="entry-date" name="entry-date" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="entry-text">오늘의 기록</label>
-                            <textarea id="entry-text" name="entry-text" rows="5" placeholder="어떤 특별한 순간이 있었나요?"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="entry-photo">사진 추가</label>
-                            <input type="file" id="entry-photo" name="entry-photo" accept="image/*">
-                            <img id="photo-preview" src="#" alt="사진 미리보기" class="hidden">
-                        </div>
-                        <button type="submit" class="submit-button">기록 저장하기</button>
-                    </form>
+                <!-- 탭 네비게이션 추가 -->
+                <div class="tab-nav">
+                    <button class="tab-button active" data-tab="entries">육아 기록</button>
+                    <button class="tab-button" data-tab="essays">저장된 에세이</button>
                 </div>
-                <button id="generate-essay-button" class="action-button">AI 에세이 만들기</button>
-                <div id="entries-container"></div>
+
+                <!-- 육아 기록 탭 콘텐츠 -->
+                <div id="entries-tab" class="tab-content active">
+                    <div id="entry-form-container">
+                        <form id="entry-form">
+                            <div class="form-group">
+                                <label for="entry-date">날짜</label>
+                                <input type="date" id="entry-date" name="entry-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="entry-text">오늘의 기록</label>
+                                <textarea id="entry-text" name="entry-text" rows="5" placeholder="어떤 특별한 순간이 있었나요?"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="entry-photo">사진 추가</label>
+                                <input type="file" id="entry-photo" name="entry-photo" accept="image/*">
+                                <img id="photo-preview" src="#" alt="사진 미리보기" class="hidden">
+                            </div>
+                            <button type="submit" class="submit-button">기록 저장하기</button>
+                        </form>
+                    </div>
+                    <button id="generate-essay-button" class="action-button">AI 에세이 만들기</button>
+                    <div id="entries-container"></div>
+                </div>
+
+                <!-- 저장된 에세이 탭 콘텐츠 -->
+                <div id="essays-tab" class="tab-content">
+                    <div id="essays-container">
+                        <!-- 저장된 에세이가 여기에 표시됩니다. -->
+                    </div>
+                </div>
             </main>
         </section>
 
@@ -68,6 +84,6 @@
         </div>
     </div>
 
-    <script src="main.js?v=1716183353"></script>
+    <script src="main.js?v=1716184000"></script>
 </body>
 </html>
