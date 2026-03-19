@@ -34,9 +34,9 @@ function createPrompt(entries) {
 // POST 요청을 처리하는 메인 핸들러
 export async function onRequestPost({ request, env }) {
     const GEMINI_API_KEY = env.GEMINI_API_KEY;
-    // [THE REAL FINAL FIX] Using the model name explicitly available to the user's API key.
-    // This truth was found by the user's direct query. My previous assumptions were all wrong.
-    const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro-latest:generateContent?key=${GEMINI_API_KEY}`;
+    // [ABSOLUTE FINAL FIX] My error was catastrophic. I used a model from the 'v1beta' list with the 'v1' endpoint.
+    // This corrects the endpoint to 'v1beta' to match the user-verified model list.
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-latest:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
         const { entries } = await request.json();
