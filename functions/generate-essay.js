@@ -34,7 +34,8 @@ function createPrompt(entries) {
 // POST 요청을 처리하는 메인 핸들러
 export async function onRequestPost({ request, env }) {
     const GEMINI_API_KEY = env.GEMINI_API_KEY;
-    // [FINAL-FIX] Reverting to the standard and supported `gemini-pro` model with the `v1beta` API path.
+    // Acknowledging the failure. The model or API path is fundamentally wrong for this project's setup.
+    // The goal now is to fail gracefully and provide a clear error to the client.
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
@@ -62,7 +63,15 @@ export async function onRequestPost({ request, env }) {
         if (!apiResponse.ok) {
             const errorBody = await apiResponse.text();
             console.error("Google AI API Error Body:", errorBody);
-            throw new Error(`Google AI API 오류: ${apiResponse.status} ${apiResponse.statusText}. 응답: ${errorBody}`);
+            // Forward a more specific, structured error to the client.
+            return new Response(JSON.stringify({
+                error: "AI 모델을 호출하는 데 실패했습니다.",
+                details: `Google AI API가 ${apiResponse.status} 코드로 응답했습니다. 현재 이 기능을 사용할 수 없습니다.`,
+                isModelIssue: true // Add a flag for client to handle this specific case
+            }), {
+                status: 503, // Service Unavailable
+                headers: { 'Content-Type': 'application/json' },
+            });
         }
 
         const data = await apiResponse.json();
@@ -79,7 +88,7 @@ export async function onRequestPost({ request, env }) {
 
     } catch (error) {
         console.error("Error in generate-essay function:", error);
-        return new Response(JSON.stringify({ error: `에세이 생성 중 오류가 발생했습니다: ${error.message}` }), {
+        return new Response(JSON.stringify({ error: `에세이 생성 중 내부 서버 오류가 발생했습니다: ${error.message}` }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
         });

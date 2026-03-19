@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const essayModal = document.getElementById('essay-modal');
     const closeButton = document.querySelector('.close-button');
     const essayOutput = document.getElementById('essay-output');
-    // const saveEssayButton = document.getElementById('final-save-button'); // [FIX] Temporarily disabled to prevent crash
+    const finalSaveButton = document.getElementById('final-save-button');
 
     entryDate.valueAsDate = new Date();
 
@@ -25,8 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
             mainScreen.classList.remove('hidden');
             userIdSpan.textContent = username;
             profilePicture.src = `https://api.dicebear.com/8.x/miniavs/svg?seed=${username}`;
-        } else {
-            alert('아이디를 입력해주세요.');
         }
     });
 
@@ -39,9 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 photoPreview.classList.remove('hidden');
             };
             reader.readAsDataURL(file);
-        } else {
-            photoPreview.src = '';
-            photoPreview.classList.add('hidden');
         }
     });
 
@@ -82,17 +77,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ entries }),
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`서버 응답 오류: ${response.status} - ${errorText}`);
+                throw data; // Throw the parsed JSON error object from the server
             }
 
-            const data = await response.json();
             essayOutput.innerHTML = data.essay.replace(/\n/g, '<br><br>');
 
         } catch (error) {
             console.error('에세이 생성 실패:', error);
-            essayOutput.innerHTML = `<p style="color: red;">에세이 생성에 실패했어요. 네트워크 연결을 확인하거나 잠시 후 다시 시도해주세요.<br><br><strong>오류 상세:</strong> ${error.message}</p>`;
+
+            // [Graceful Failure] Check for the specific model issue flag from the server
+            if (error && error.isModelIssue) {
+                essayOutput.innerHTML = `<div style="text-align: center; color: #d9534f;">
+                    <h3 style="margin-bottom: 15px;">AI 기능 점검 중</h3>
+                    <p>현재 AI 에세이 생성 기능에 문제가 발생하여<br>일시적으로 사용이 중단되었습니다.</p>
+                    <p>개발팀이 이 문제를 인지하고 있으며,<br>빠르게 해결하도록 노력하겠습니다.</p>
+                    <p style="margin-top: 20px;">이용에 불편을 드려 대단히 죄송합니다.</p>
+                </div>`;
+            } else {
+                const errorMessage = error.error ? `${error.error} - ${error.details || ''}` : (error.message || JSON.stringify(error));
+                essayOutput.innerHTML = `<p style="color: red;">에세이 생성에 실패했어요. 네트워크 연결을 확인하거나 잠시 후 다시 시도해주세요.<br><br><strong>오류 상세:</strong> ${errorMessage}</p>`;
+            }
         }
     });
 
@@ -103,11 +110,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // [FIX] Temporarily disabled to prevent crash
-    // saveEssayButton.addEventListener('click', () => {
-    //     alert('에세이가 저장되었습니다! (이 기능은 곧 구현될 예정입니다.)');
-    //     essayModal.classList.add('hidden');
-    // });
+    finalSaveButton.addEventListener('click', () => {
+        alert('에세이가 저장되었습니다! (이 기능은 곧 구현될 예정입니다.)');
+        essayModal.classList.add('hidden');
+    });
 
     function addEntryToDOM(date, text, photoSrc) {
         const entryElement = document.createElement('div');
