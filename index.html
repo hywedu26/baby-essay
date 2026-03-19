@@ -34,9 +34,25 @@
                 </div>
             </header>
             <main>
-                <div id="essay-creation-area">
-                 
+                <div id="entry-form-container">
+                    <form id="entry-form">
+                        <div class="form-group">
+                            <label for="entry-date">날짜</label>
+                            <input type="date" id="entry-date" name="entry-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="entry-text">오늘의 기록</label>
+                            <textarea id="entry-text" name="entry-text" rows="4" placeholder="어떤 특별한 순간이 있었나요?"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="entry-photo">사진 추가</label>
+                            <input type="file" id="entry-photo" name="entry-photo" accept="image/*">
+                            <img id="photo-preview" src="" alt="사진 미리보기" class="hidden">
+                        </div>
+                        <button type="submit" class="submit-button">기록 저장</button>
+                    </form>
                 </div>
+                <div id="entries-container"></div>
             </main>
         </section>
     </div>

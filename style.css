@@ -137,6 +137,75 @@ main {
     padding: 2rem;
 }
 
+#entry-form-container {
+    margin-bottom: 2rem;
+}
+
+#entry-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+#entry-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+#entry-form input[type="date"],
+#entry-form textarea,
+#entry-form input[type="file"] {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+#entry-form textarea {
+    resize: vertical;
+}
+
+#photo-preview {
+    width: 100%;
+    max-height: 200px;
+    margin-top: 1rem;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #28a745;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+}
+
+.submit-button:hover {
+    background-color: #218838;
+}
+
+#entries-container .entry {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border-left: 5px solid var(--primary-color);
+}
+
+#entries-container .entry img {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
     #app {
@@ -147,5 +216,8 @@ main {
     }
     .login-container h1 {
         font-size: 2rem;
+    }
+    main {
+        padding: 1.5rem;
     }
 }
