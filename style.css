@@ -24,6 +24,7 @@ body {
     width: 100%;
     max-width: 420px;
     margin: 2rem;
+    position: relative; /* Stacking context for modal */
 }
 
 .screen {
@@ -234,11 +235,24 @@ main {
     justify-content: center;
     align-items: center;
     opacity: 0;
-    transition: opacity 0.3s ease-in-out;
+    visibility: hidden; /* Start hidden */
+    pointer-events: none; /* Ignore clicks when hidden */
+    transition: opacity 0.3s ease-in-out, visibility 0s 0.3s;
+}
+
+/* [BUG FIX] This is the crucial part. */
+.modal.hidden {
+    display: flex; /* Override display:none */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .modal:not(.hidden) {
     opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 0.3s ease-in-out;
 }
 
 .modal-content {
