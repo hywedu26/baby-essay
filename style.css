@@ -1,47 +1,39 @@
-/* === Modern & Warm Design Overhaul === */
+/* === Babily-Inspired Design Overhaul: Cute & Friendly === */
 
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&display=swap');
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
 :root {
-    /* Color Palette */
-    --primary-color: #ff8c42; /* A warm, friendly orange */
-    --primary-glow: rgba(255, 140, 66, 0.4);
-    --secondary-color: #ffdd77; /* Soft yellow accent */
-    --bg-color: #fffcf9; /* A very light, warm off-white */
+    /* Color Palette - Pastel & Soft */
+    --primary-color: #ffafcc; /* Soft Pink */
+    --primary-glow: rgba(255, 175, 204, 0.5);
+    --secondary-color: #a2d2ff; /* Sky Blue */
+    --accent-color: #fcf6bd; /* Soft Yellow */
+    --bg-color: #fdf5f7; /* Very light pinkish white */
     --surface-color: #ffffff;
-    --text-primary: #3d352e;
-    --text-secondary: #7a6a5d;
-    --border-color: #eee4da;
+    --text-primary: #5c4742;
+    --text-secondary: #a38c85;
+    --border-color: #ffe0e9;
 
     /* Typography */
-    --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    --font-family-display: 'Nunito', 'Pretendard', sans-serif;
+    --font-family-body: 'Pretendard', sans-serif;
 
     /* Effects */
-    --shadow-deep: 0px 5px 15px rgba(0, 0, 0, 0.05), 0px 15px 35px rgba(61, 53, 46, 0.1);
-    --shadow-lifted: 0px 2px 8px rgba(0, 0, 0, 0.07), 0px 8px 20px rgba(99, 82, 68, 0.08);
+    --shadow-soft: 0px 4px 10px rgba(188, 149, 158, 0.15);
+    --shadow-dreamy: 0px 8px 25px rgba(188, 149, 158, 0.15);
 }
 
 body {
-    font-family: var(--font-family);
+    font-family: var(--font-family-body);
     margin: 0;
     background-color: var(--bg-color);
+    background-image: linear-gradient(175deg, #ffffff 0%, #fff0f5 100%);
     color: var(--text-primary);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    position: relative;
-}
-
-/* Subtle noise texture for a premium feel */
-body::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    width: 100%; height: 100%;
-    z-index: -1;
-    opacity: 0.15;
-    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800"><g fill-rule="evenodd"><g fill="%23a19388" transform="translate(400 400)"><path d="M0 343.8V-343.8H1V343.8z" transform="rotate(120)"></path><path d="M0 343.8V-343.8H1V343.8z" transform="rotate(60)"></path><path d="M0 343.8V-343.8H1V343.8z"></path></g></g></svg>');
 }
 
 #app {
@@ -53,8 +45,9 @@ body::before {
 
 .screen {
     background-color: var(--surface-color);
-    border-radius: 24px;
-    box-shadow: var(--shadow-deep);
+    border-radius: 32px; /* Much rounder */
+    box-shadow: var(--shadow-dreamy);
+    border: 1px solid rgba(255,255,255,0.8);
     overflow: hidden;
     transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
@@ -70,12 +63,10 @@ body::before {
 }
 
 .login-container h1 {
+    font-family: var(--font-family-display);
     font-size: 2.8rem;
     font-weight: 900;
-    color: var(--text-primary);
-    background: -webkit-linear-gradient(45deg, var(--primary-color), #d85c0a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--primary-color);
     margin-bottom: 1rem;
 }
 
@@ -96,13 +87,14 @@ body::before {
     margin-bottom: 0.75rem;
     font-weight: 600;
     color: var(--text-primary);
+    font-family: var(--font-family-display);
 }
 
 #login-form input {
     width: 100%;
     padding: 1rem 1.2rem;
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 16px; /* rounder */
     font-size: 1rem;
     box-sizing: border-box;
     background-color: var(--bg-color);
@@ -119,7 +111,7 @@ body::before {
 
 /* Main Screen Header */
 header {
-    background: linear-gradient(135deg, var(--primary-color), #ffaa77);
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
     color: white;
     padding: 1.5rem 2rem;
     display: flex;
@@ -130,21 +122,23 @@ header {
 .profile-greeting {
     display: flex;
     align-items: center;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 700;
+    font-family: var(--font-family-display);
 }
 
 .profile-picture {
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.8);
+    border: 3px solid white;
     margin-right: 1rem;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff; /* For transparent avatar parts */
 }
 
 main {
-    padding: 2rem;
+    padding: 1.5rem;
 }
 
 /* Form Elements */
@@ -152,6 +146,7 @@ main {
     display: block;
     margin-bottom: 0.75rem;
     font-weight: 600;
+    font-family: var(--font-family-display);
     color: var(--text-primary);
 }
 
@@ -159,10 +154,10 @@ main {
     width: 100%;
     padding: 1rem 1.2rem;
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 16px;
     font-size: 1rem;
     box-sizing: border-box;
-    background-color: var(--bg-color);
+    background-color: #fff;
     color: var(--text-primary);
     transition: all 0.2s ease-in-out;
 }
@@ -170,81 +165,67 @@ main {
 #entry-form input:focus, #entry-form textarea:focus {
     outline: none;
     border-color: var(--primary-color);
-    background-color: var(--surface-color);
     box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
 #entry-form textarea {
     resize: vertical;
-    min-height: 120px;
+    min-height: 140px;
 }
 
 #entry-form .form-group {
     margin-bottom: 1.5rem;
 }
 
-/* Buttons with Glow Effect */
+/* Buttons */
 .button {
     width: 100%;
     padding: 1.2rem;
     border: none;
-    border-radius: 16px;
+    border-radius: 99px; /* pill shape */
     font-size: 1.2rem;
     font-weight: 700;
+    font-family: var(--font-family-display);
     cursor: pointer;
-    transform: translateZ(0); /* Promotes to composite layer */
-    transition: all 0.2s ease-in-out;
+    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .button-primary {
     background-color: var(--primary-color);
     color: white;
-    box-shadow: 0 4px 20px var(--primary-glow);
+    box-shadow: 0 4px 15px var(--primary-glow);
 }
 
 .button-primary:hover, .button-primary:focus {
-    transform: translateY(-3px);
-    box-shadow: 0 7px 25px var(--primary-glow);
-    background-color: #ff9954;
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 25px var(--primary-glow);
 }
 
 .button-primary:active {
-    transform: translateY(0);
-    background-color: #e87c3a;
-}
-
-.button-secondary {
-    background-color: var(--surface-color);
-    color: var(--primary-color);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-lifted);
-}
-
-.button-secondary:hover, .button-secondary:focus {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border-color: var(--primary-color);
+    transform: translateY(0) scale(1);
 }
 
 /* Saved Entries */
 #entries-container {
-    margin-top: 3rem;
+    margin-top: 2rem;
+    padding: 0 0.5rem;
 }
 
 .entry {
     background-color: var(--surface-color);
-    border-radius: 16px;
+    border-radius: 24px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    box-shadow: var(--shadow-lifted);
-    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-soft);
+    border: 1px solid transparent;
     transition: all 0.2s ease-in-out;
+    border-left: 5px solid var(--secondary-color);
 }
 
 .entry:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1), 0 10px 20px rgba(99, 82, 68, 0.08);
-    border-color: var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-dreamy);
+    border-color: var(--border-color);
 }
 
 .entry h3 {
@@ -253,15 +234,17 @@ main {
     color: var(--text-secondary);
     margin-top: 0;
     margin-bottom: 1rem;
+    font-family: var(--font-family-body);
 }
 
 .entry p {
     line-height: 1.7;
+    font-family: var(--font-family-body);
 }
 
 .entry img {
     width: 100%;
-    border-radius: 12px;
+    border-radius: 16px;
     margin-bottom: 1rem;
 }
 
@@ -270,15 +253,15 @@ main {
     position: fixed;
     z-index: 1000;
     left: 0; top: 0; width: 100%; height: 100%;
-    background-color: rgba(61, 53, 46, 0.7);
-    backdrop-filter: blur(8px);
+    background-color: rgba(255, 245, 248, 0.7);
+    backdrop-filter: blur(10px);
     display: flex;
     justify-content: center;
     align-items: center;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
 }
 
 .modal:not(.hidden) {
@@ -290,32 +273,44 @@ main {
 .modal-content {
     background-color: var(--surface-color);
     padding: 2.5rem;
-    border-radius: 24px;
-    box-shadow: var(--shadow-deep);
+    border-radius: 32px;
+    box-shadow: var(--shadow-dreamy);
     width: 90%;
     max-width: 550px;
-    transform: scale(0.95);
-    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    transform: scale(0.9);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    position: relative;
 }
 
 .modal:not(.hidden) .modal-content {
     transform: scale(1);
+    opacity: 1;
 }
 
 .close-button {
     position: absolute;
-    top: 20px;
-    right: 25px;
+    top: 15px;
+    right: 15px;
+    width: 36px;
+    height: 36px;
+    background: var(--bg-color);
+    border-radius: 50%;
     color: var(--text-secondary);
-    font-size: 32px;
-    font-weight: 300;
+    font-size: 24px;
+    font-weight: 600;
     cursor: pointer;
-    transition: color 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    border: 1px solid var(--border-color);
 }
 
 .close-button:hover {
-    color: var(--text-primary);
-    transform: rotate(90deg);
+    background: var(--primary-color);
+    color: white;
+    transform: rotate(90deg) scale(1.1);
 }
 
 #essay-output {
@@ -326,32 +321,29 @@ main {
     max-height: 60vh;
     overflow-y: auto;
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 16px;
     background-color: var(--bg-color);
     line-height: 1.8;
     white-space: pre-wrap;
+    font-family: var(--font-family-body);
 }
 
 #photo-preview {
     width: 100%;
     max-height: 250px;
     margin-top: 1rem;
-    border-radius: 12px;
+    border-radius: 16px;
     object-fit: cover;
 }
 
-/* === Class Mapping from HTML === */
-/* This ensures the new styles apply to the existing HTML classes */
-.login-button { 
-    composes: button button-primary; 
-}
-.submit-button, .action-button {
-    margin-bottom: 1.5rem;
+/* Class Mapping from HTML */
+/* The existing HTML classes will now use the new button styles */
+.login-button, .submit-button, .action-button, #final-save-button {
     composes: button button-primary;
 }
 
-#final-save-button {
-    margin-bottom: 0;
+.action-button, .submit-button {
+    margin-bottom: 1.5rem;
 }
 
 

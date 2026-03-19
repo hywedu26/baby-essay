@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const photoPreview = document.getElementById('photo-preview');
     const entriesContainer = document.getElementById('entries-container');
 
-    // Essay Modal Elements - Re-enabled
+    // Essay Modal Elements
     const generateEssayButton = document.getElementById('generate-essay-button');
     const essayModal = document.getElementById('essay-modal');
     const closeButton = document.querySelector('.close-button');
@@ -35,8 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
             loginScreen.classList.add('hidden');
             mainScreen.classList.remove('hidden');
             userIdSpan.textContent = username;
-            // Use a fun, consistent avatar service
-            profilePicture.src = `https://api.dicebear.com/8.x/adventurer/svg?seed=${username}`;
+            // Update to a cuter avatar style to match the 'Babily' concept
+            profilePicture.src = `https://api.dicebear.com/8.x/miniavs/svg?seed=${username}`;
         } else {
             alert('아이디를 입력해주세요.');
         }
@@ -74,15 +74,15 @@ document.addEventListener('DOMContentLoaded', () => {
         entryDate.valueAsDate = new Date();
     });
 
-    // API-based Essay Generation - Re-enabled
+    // API-based Essay Generation
     generateEssayButton.addEventListener('click', async () => {
         const entryElements = entriesContainer.querySelectorAll('.entry');
-        if (entryElements.length < 2) { // Require at least 2 entries
+        if (entryElements.length < 2) {
             alert('AI 에세이를 생성하려면 최소 2개 이상의 기록이 필요합니다.');
             return;
         }
 
-        essayOutput.innerHTML = '<p>AI가 여러분의 소중한 기록들을 바탕으로 에세이를 작성하고 있습니다. 잠시만 기다려주세요...</p>';
+        essayOutput.innerHTML = '<p>AI가 아가의 소중한 기록으로 예쁜 글을 만들고 있어요. 잠시만 기다려주세요...</p>';
         essayModal.classList.remove('hidden');
 
         const entries = Array.from(entryElements).map(entry => ({
@@ -91,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
 
         try {
-            // Use the proxy server defined in firebase.json
             const response = await fetch('/generate-essay', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -104,16 +103,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const data = await response.json();
-            // Format the essay output for better readability
             essayOutput.innerHTML = data.essay.replace(/\n/g, '<br><br>');
 
         } catch (error) {
             console.error('에세이 생성 실패:', error);
-            essayOutput.innerHTML = `<p style="color: red;">에세이 생성에 실패했습니다. 네트워크 연결을 확인하거나 잠시 후 다시 시도해주세요.<br><br><strong>오류 상세:</strong> ${error.message}</p>`;
+            essayOutput.innerHTML = `<p style="color: red;">에세이 생성에 실패했어요. 네트워크 연결을 확인하거나 잠시 후 다시 시도해주세요.<br><br><strong>오류 상세:</strong> ${error.message}</p>`;
         }
     });
 
-    // Modal Controls - Re-enabled
+    // Modal Controls
     closeButton.addEventListener('click', () => essayModal.classList.add('hidden'));
     essayModal.addEventListener('click', (e) => {
         if (e.target === essayModal) {
@@ -121,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Save Essay Button Handler - Re-enabled
+    // Save Essay Button Handler
     saveEssayButton.addEventListener('click', () => {
         alert('에세이가 저장되었습니다! (이 기능은 곧 구현될 예정입니다.)');
         essayModal.classList.add('hidden');
@@ -138,11 +136,10 @@ document.addEventListener('DOMContentLoaded', () => {
             photoHTML = `<img src="${photoSrc}" alt="기록 사진">`;
         }
         
-        // Sanitize and format text
         const textParagraph = document.createElement('p');
         textParagraph.innerHTML = text.replace(/\n/g, '<br>');
 
-        entryElement.innerHTML = `<h3>${new Date(date).toLocaleDateString('ko-KR')}</h3>`;
+        entryElement.innerHTML = `<h3>${new Date(date).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</h3>`;
         if(photoHTML) entryElement.insertAdjacentHTML('beforeend', photoHTML);
         entryElement.appendChild(textParagraph);
 
