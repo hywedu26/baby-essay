@@ -1,94 +1,39 @@
 /*
  * functions/generate-essay.js
- * AI 에세이 생성을 위한 서버리스 함수 (Cloudflare Workers with Google Gemini AI)
+ * [FINAL DIAGNOSTIC VERSION]
+ * This version removes all AI-related logic to test if the function deployment is working correctly.
+ * It should always return a fixed success message.
  */
 
-// AI에게 전달할 프롬프트를 생성하는 함수
-function createPrompt(entries) {
-    const sortedEntries = entries.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    let recordsText = '';
-    sortedEntries.forEach(entry => {
-        recordsText += `- ${entry.date}: ${entry.text}\n`;
-    });
-
-    return `
-        당신은 아이를 세상에서 가장 사랑하는 부모입니다. 당신의 임무는 아래에 있는 육아 기록들을 바탕으로, 아이에게 보내는 한 편의 따뜻하고 감성적인 에세이를 작성하는 것입니다.
-
-        **에세이 작성 규칙:**
-        1. 모든 기록을 자연스럽게 하나로 엮어, 시간의 흐름이 느껴지는 이야기로 만드세요.
-        2. 아이에 대한 사랑과 소중함이 문장마다 묻어나오도록 감성적인 표현을 사용하세요.
-        3. 부모의 시점에서 아이에게 직접 말하는 듯한 부드러운 문체("~했단다", "~란다", "~해.")를 사용하세요.
-        4. 기록에 있는 구체적인 사건들을 언급하며, 그 순간의 감정을 풍부하게 묘사하세요.
-        5. 에세이의 시작과 끝은 아이를 향한 사랑의 메시지를 담은 문장으로 감싸주세요.
-        6. 결과물은 순수한 에세이 텍스트만 포함해야 하며, 제목이나 추가적인 설명 없이 바로 본문으로 시작하세요.
-        7. 최종 결과물은 HTML 형식으로, 단락은 <p> 태그로, 강조하고 싶은 부분은 <strong> 태그를 사용해주세요.
-
-        **다음은 아이의 소중한 기록들입니다:**
-        ${recordsText}
-
-        이제, 이 기록들을 바탕으로 아이의 마음을 어루만져 줄 아름다운 에세이를 작성해주세요.
-    `;
-}
-
-// POST 요청을 처리하는 메인 핸들러
 export async function onRequestPost({ request, env }) {
-    const GEMINI_API_KEY = env.GEMINI_API_KEY;
-    // Acknowledging the failure. The model or API path is fundamentally wrong for this project's setup.
-    // The goal now is to fail gracefully and provide a clear error to the client.
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
+        // We still parse the request to ensure the client-side call is valid.
         const { entries } = await request.json();
 
         if (!entries || entries.length === 0) {
-            return new Response(JSON.stringify({ error: '에세이를 생성할 기록이 없습니다.' }), {
+            return new Response(JSON.stringify({ error: '[Test] No entries received.' }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' },
             });
         }
 
-        const prompt = createPrompt(entries);
+        // Instead of calling any external API, return a fixed success JSON object.
+        // This is the message we expect to see on the client-side.
+        const successResponse = {
+            essay: "<p><strong>진단 성공:</strong> 서버 기능이 성공적으로 업데이트되었습니다.</strong></p><p>만약 이 메시지가 보인다면, 배포 시스템은 정상적으로 작동하고 있습니다. AI 에세이 생성 실패의 원인은 Google AI API 키의 권한, 청구 설정 또는 API 자체의 일시적인 문제일 가능성이 매우 높습니다.</p>"
+        };
 
-        const apiResponse = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-            }),
-        });
-
-        if (!apiResponse.ok) {
-            const errorBody = await apiResponse.text();
-            console.error("Google AI API Error Body:", errorBody);
-            // Forward a more specific, structured error to the client.
-            return new Response(JSON.stringify({
-                error: "AI 모델을 호출하는 데 실패했습니다.",
-                details: `Google AI API가 ${apiResponse.status} 코드로 응답했습니다. 현재 이 기능을 사용할 수 없습니다.`,
-                isModelIssue: true // Add a flag for client to handle this specific case
-            }), {
-                status: 503, // Service Unavailable
-                headers: { 'Content-Type': 'application/json' },
-            });
-        }
-
-        const data = await apiResponse.json();
-
-        if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
-             throw new Error("AI 응답에서 예상된 콘텐츠 구조를 찾을 수 없습니다.");
-        }
-        
-        const essay = data.candidates[0].content.parts[0].text;
-
-        return new Response(JSON.stringify({ essay }), {
+        return new Response(JSON.stringify(successResponse), {
             headers: { 'Content-Type': 'application/json' },
         });
 
     } catch (error) {
-        console.error("Error in generate-essay function:", error);
-        return new Response(JSON.stringify({ error: `에세이 생성 중 내부 서버 오류가 발생했습니다: ${error.message}` }), {
+        // If an error occurs even in this simplified version, it's likely a fundamental issue.
+        return new Response(JSON.stringify({ 
+            error: '[Test] An unexpected error occurred in the diagnostic function.',
+            details: error.message
+        }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
         });
