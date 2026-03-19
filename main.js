@@ -20,13 +20,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const essayModal = document.getElementById('essay-modal');
     const closeButton = document.querySelector('.close-button');
     const essayOutput = document.getElementById('essay-output');
-    const saveEssayButton = document.getElementById('save-essay-button');
+    // 'final-save-button' ID를 사용하도록 수정
+    const saveEssayButton = document.getElementById('final-save-button');
 
     // --- Initialization ---
     entryDate.valueAsDate = new Date();
 
     // --- Event Listeners ---
 
+    // [BUG FIX] Correct Login Handler
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const username = e.target.username.value;
@@ -35,9 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
             mainScreen.classList.remove('hidden');
             userIdSpan.textContent = username;
             profilePicture.src = `https://i.pravatar.cc/150?u=${username}`;
+        } else {
+            alert('아이디를 입력해주세요.');
         }
     });
 
+    // Photo Preview
     entryPhoto.addEventListener('change', () => {
         const file = entryPhoto.files[0];
         if (file) {
@@ -47,9 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 photoPreview.classList.remove('hidden');
             };
             reader.readAsDataURL(file);
+        } else {
+            photoPreview.src = '';
+            photoPreview.classList.add('hidden');
         }
     });
 
+    // Save Entry
     entryForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const date = entryDate.value;
@@ -65,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
         entryDate.valueAsDate = new Date();
     });
 
-    // --- API-based Essay Generation ---
+    // API-based Essay Generation
     generateEssayButton.addEventListener('click', async () => {
         const entryElements = entriesContainer.querySelectorAll('.entry');
         if (entryElements.length === 0) {
@@ -73,33 +82,27 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 1. Show loading state
         essayOutput.innerHTML = '<p>AI가 여러분의 소중한 기록들을 바탕으로 에세이를 작성하고 있습니다. 잠시만 기다려주세요...</p>';
         essayModal.classList.remove('hidden');
 
-        // 2. Collect entries data
         const entries = Array.from(entryElements).map(entry => ({
             date: entry.dataset.date,
             text: entry.querySelector('p').innerText,
         }));
 
         try {
-            // 3. Call the serverless function
             const response = await fetch('/generate-essay', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ entries }),
             });
 
             if (!response.ok) {
-                throw new Error(`서버 오류: ${response.status} ${response.statusText}`);
+                const errorText = await response.text();
+                throw new Error(`서버 오류: ${response.status} ${errorText}`);
             }
 
             const data = await response.json();
-
-            // 4. Display the result
             essayOutput.innerHTML = data.essay;
 
         } catch (error) {
@@ -108,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Modal Control ---
+    // Modal Controls
     closeButton.addEventListener('click', () => essayModal.classList.add('hidden'));
     essayModal.addEventListener('click', (e) => {
         if (e.target === essayModal) {
@@ -116,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // [BUG FIX] Correct Save Essay Button Handler
     saveEssayButton.addEventListener('click', () => {
         alert('에세이가 저장되었습니다! (이 기능은 곧 구현될 예정입니다.)');
         essayModal.classList.add('hidden');
