@@ -15,20 +15,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const photoPreview = document.getElementById('photo-preview');
     const entriesContainer = document.getElementById('entries-container');
 
-    // Essay Modal Elements
+    // --- DEBUG: Temporarily disable modal elements ---
     const generateEssayButton = document.getElementById('generate-essay-button');
-    const essayModal = document.getElementById('essay-modal');
-    const closeButton = document.querySelector('.close-button');
-    const essayOutput = document.getElementById('essay-output');
-    // 'final-save-button' ID를 사용하도록 수정
-    const saveEssayButton = document.getElementById('final-save-button');
+    // const essayModal = document.getElementById('essay-modal');
+    // const closeButton = document.querySelector('.close-button');
+    // const essayOutput = document.getElementById('essay-output');
+    // const saveEssayButton = document.getElementById('final-save-button');
 
     // --- Initialization ---
     entryDate.valueAsDate = new Date();
 
     // --- Event Listeners ---
 
-    // [BUG FIX] Correct Login Handler
+    // Login Handler
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const username = e.target.username.value;
@@ -74,6 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
         entryDate.valueAsDate = new Date();
     });
 
+    // --- DEBUG: Temporarily disable essay generation and modal controls ---
+    generateEssayButton.addEventListener('click', () => {
+        alert('현재 디버깅 모드로 인해 AI 에세이 기능을 일시적으로 비활성화했습니다.');
+    });
+
+    /*
     // API-based Essay Generation
     generateEssayButton.addEventListener('click', async () => {
         const entryElements = entriesContainer.querySelectorAll('.entry');
@@ -85,30 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         essayOutput.innerHTML = '<p>AI가 여러분의 소중한 기록들을 바탕으로 에세이를 작성하고 있습니다. 잠시만 기다려주세요...</p>';
         essayModal.classList.remove('hidden');
 
-        const entries = Array.from(entryElements).map(entry => ({
-            date: entry.dataset.date,
-            text: entry.querySelector('p').innerText,
-        }));
-
-        try {
-            const response = await fetch('/generate-essay', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ entries }),
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`서버 오류: ${response.status} ${errorText}`);
-            }
-
-            const data = await response.json();
-            essayOutput.innerHTML = data.essay;
-
-        } catch (error) {
-            console.error('에세이 생성 실패:', error);
-            essayOutput.innerHTML = `<p style="color: red;">에세이 생성에 실패했습니다. 잠시 후 다시 시도해주세요.<br><br>오류: ${error.message}</p>`;
-        }
+        // ... (rest of the fetch logic)
     });
 
     // Modal Controls
@@ -119,11 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // [BUG FIX] Correct Save Essay Button Handler
+    // Save Essay Button Handler
     saveEssayButton.addEventListener('click', () => {
         alert('에세이가 저장되었습니다! (이 기능은 곧 구현될 예정입니다.)');
         essayModal.classList.add('hidden');
     });
+    */
 
     // --- DOM Manipulation Functions ---
     function addEntryToDOM(date, text, photoSrc) {
