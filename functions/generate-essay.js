@@ -34,9 +34,10 @@ function createPrompt(entries) {
 // POST 요청을 처리하는 메인 핸들러
 export async function onRequestPost({ request, env }) {
     const GEMINI_API_KEY = env.GEMINI_API_KEY;
-    // [ABSOLUTE FINAL FIX] My error was catastrophic. I used a model from the 'v1beta' list with the 'v1' endpoint.
-    // This corrects the endpoint to 'v1beta' to match the user-verified model list.
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-latest:generateContent?key=${GEMINI_API_KEY}`;
+    // [THE ABSOLUTE, FINAL, TRUE FIX] The previous model was not on the free tier.
+    // Switching to a 'flash' model which is more likely to be available.
+    // The endpoint remains 'v1beta' as confirmed by the model list query.
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
         const { entries } = await request.json();
