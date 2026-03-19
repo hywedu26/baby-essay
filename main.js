@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Event Listeners ---
 
-    // Login
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const username = e.target.username.value;
@@ -36,12 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
             mainScreen.classList.remove('hidden');
             userIdSpan.textContent = username;
             profilePicture.src = `https://i.pravatar.cc/150?u=${username}`;
-        } else {
-            alert('아이디를 입력해주세요.');
         }
     });
 
-    // Photo Preview
     entryPhoto.addEventListener('change', () => {
         const file = entryPhoto.files[0];
         if (file) {
@@ -51,45 +47,68 @@ document.addEventListener('DOMContentLoaded', () => {
                 photoPreview.classList.remove('hidden');
             };
             reader.readAsDataURL(file);
-        } else {
-            photoPreview.src = '';
-            photoPreview.classList.add('hidden');
         }
     });
 
-    // Save Entry
     entryForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const date = entryDate.value;
         const text = e.target['entry-text'].value;
-        const photoSrc = photoPreview.src;
-
         if (!date || !text) {
             alert('날짜와 기록을 모두 입력해주세요.');
             return;
         }
-
-        addEntryToDOM(date, text, photoSrc);
-
-        // Reset form
+        addEntryToDOM(date, text, photoPreview.src);
         entryForm.reset();
         photoPreview.classList.add('hidden');
         photoPreview.src = '';
         entryDate.valueAsDate = new Date();
     });
 
-    // Essay Modal Control
-    generateEssayButton.addEventListener('click', () => {
-        const entries = entriesContainer.querySelectorAll('.entry');
-        if (entries.length === 0) {
+    // --- API-based Essay Generation ---
+    generateEssayButton.addEventListener('click', async () => {
+        const entryElements = entriesContainer.querySelectorAll('.entry');
+        if (entryElements.length === 0) {
             alert('에세이를 생성하려면 먼저 하나 이상의 기록을 저장해야 합니다.');
             return;
         }
-        const generatedEssay = generateMockEssay(entries);
-        essayOutput.innerHTML = generatedEssay;
+
+        // 1. Show loading state
+        essayOutput.innerHTML = '<p>AI가 여러분의 소중한 기록들을 바탕으로 에세이를 작성하고 있습니다. 잠시만 기다려주세요...</p>';
         essayModal.classList.remove('hidden');
+
+        // 2. Collect entries data
+        const entries = Array.from(entryElements).map(entry => ({
+            date: entry.dataset.date,
+            text: entry.querySelector('p').innerText,
+        }));
+
+        try {
+            // 3. Call the serverless function
+            const response = await fetch('/generate-essay', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ entries }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`서버 오류: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            // 4. Display the result
+            essayOutput.innerHTML = data.essay;
+
+        } catch (error) {
+            console.error('에세이 생성 실패:', error);
+            essayOutput.innerHTML = `<p style="color: red;">에세이 생성에 실패했습니다. 잠시 후 다시 시도해주세요.<br><br>오류: ${error.message}</p>`;
+        }
     });
 
+    // --- Modal Control ---
     closeButton.addEventListener('click', () => essayModal.classList.add('hidden'));
     essayModal.addEventListener('click', (e) => {
         if (e.target === essayModal) {
@@ -102,12 +121,11 @@ document.addEventListener('DOMContentLoaded', () => {
         essayModal.classList.add('hidden');
     });
 
-    // --- Functions ---
-
+    // --- DOM Manipulation Functions ---
     function addEntryToDOM(date, text, photoSrc) {
         const entryElement = document.createElement('div');
         entryElement.classList.add('entry');
-        entryElement.dataset.date = date; // Store data for essay generation
+        entryElement.dataset.date = date;
 
         let photoHTML = '';
         if (photoSrc && !photoSrc.endsWith('#')) {
@@ -122,21 +140,5 @@ document.addEventListener('DOMContentLoaded', () => {
         if(photoHTML) entryElement.insertAdjacentHTML('beforeend', photoHTML);
 
         entriesContainer.prepend(entryElement);
-    }
-
-    function generateMockEssay(entries) {
-        let essayText = '<h2>우리의 작은 기록들</h2><br>';
-        essayText += '<p>너와 함께한 모든 순간은 반짝이는 별과 같았어. 하루하루가 모여 아름다운 추억의 은하수가 되었지.</p><br>';
-
-        const sortedEntries = Array.from(entries).sort((a, b) => new Date(a.dataset.date) - new Date(b.dataset.date));
-
-        sortedEntries.forEach(entry => {
-            const date = entry.querySelector('h3').textContent;
-            const text = entry.querySelector('p').innerText;
-            essayText += `<strong>${date}</strong><p>${text}</p><br>`;
-        });
-
-        essayText += '<p>이 모든 날들이 모여 너의 세상이 되고, 우리의 행복이 되었네. 앞으로도 너의 모든 첫 순간을 함께할게. 사랑한다, 아가.</p>';
-        return essayText;
     }
 });
