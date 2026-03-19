@@ -34,7 +34,9 @@ function createPrompt(entries) {
 // POST 요청을 처리하는 메인 핸들러
 export async function onRequestPost({ request, env }) {
     const GEMINI_API_KEY = env.GEMINI_API_KEY;
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+    // [FINAL, FINAL FIX] The root cause was the API version. Switched from 'v1beta' to the stable 'v1'.
+    // Using the standard 'gemini-pro' model which should be available on the stable channel.
+    const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
         const { entries } = await request.json();
@@ -55,8 +57,6 @@ export async function onRequestPost({ request, env }) {
             },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
-                // [Final Fix] Removed the unsupported 'generationConfig' for 'text/html'.
-                // The prompt already instructs the AI to format the output with HTML tags within a plain text response.
             }),
         });
 
