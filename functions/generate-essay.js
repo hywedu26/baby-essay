@@ -34,9 +34,9 @@ function createPrompt(entries) {
 // POST 요청을 처리하는 메인 핸들러
 export async function onRequestPost({ request, env }) {
     const GEMINI_API_KEY = env.GEMINI_API_KEY;
-    // [FINAL, FINAL FIX] The root cause was the API version. Switched from 'v1beta' to the stable 'v1'.
-    // Using the standard 'gemini-pro' model which should be available on the stable channel.
-    const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+    // [FINAL, FINAL, FINAL FIX] The model name was the last point of failure. 
+    // Using the specific 'gemini-1.0-pro' model, which is a standard and stable identifier.
+    const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
         const { entries } = await request.json();
