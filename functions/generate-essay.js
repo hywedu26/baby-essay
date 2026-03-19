@@ -1,32 +1,52 @@
 /*
  * functions/generate-essay.js
- * AI 에세이 생성을 위한 서버리스 함수 (Cloudflare Workers)
+ * 실제 Google Gemini AI를 호출하여 에세이를 생성하는 서버리스 함수
  */
 
-// 서버 사이드 Mock 에세이 생성 로직
-function generateMockEssayFromServer(entries) {
-    let essayText = '<h2>우리의 소중한 순간들 (서버 생성)</h2><br>';
-    essayText += '<p>함께한 모든 날들이 모여, 반짝이는 하나의 이야기가 되었습니다. 너의 작은 발자취 하나하나가 우리에겐 큰 기쁨이었어.</p><br>';
+// Google AI API 엔드포인트
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
 
-    // 클라이언트에서 정렬하여 보냈지만, 여기서 다시 정렬하여 안정성을 높일 수 있습니다.
+// AI에게 전달할 프롬프트를 생성하는 함수
+function createPrompt(entries) {
+    // 기록들을 시간순으로 정렬
     const sortedEntries = entries.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    sortedEntries.forEach(entry => {
-        // 간단한 텍스트 정제 (XSS 방지 등 실제 프로덕션에서는 더 강력한 처리가 필요)
-        const cleanText = entry.text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        essayText += `<strong>${entry.date}</strong><p>${cleanText}</p><br>`;
-    });
+    // 기록들을 하나의 텍스트로 합침
+    const entriesText = sortedEntries.map(entry => 
+        `날짜: ${entry.date}\n기록: ${entry.text}`
+    ).join('\n\n---\n\n');
 
-    essayText += '<p>이 기록들은 단순한 하루의 나열이 아니라, 너와 함께 성장하는 우리의 사랑 이야기야. 앞으로도 모든 순간을 소중히 간직할게. 사랑한다, 우리 아가.</p>';
-    return essayText;
+    // AI에게 역할을 부여하고, 결과물의 형식과 톤앤매너를 지시하는 프롬프트
+    return `
+        당신은 감성적인 육아 에세이를 작성하는 전문 작가입니다.
+        아래에 주어지는 아기와의 일상 기록들을 바탕으로, 부모의 따뜻하고 사랑스러운 마음이 잘 드러나는 한 편의 에세이를 작성해주세요.
+
+        **지침:**
+        1. 모든 기록을 자연스럽게 통합하여 하나의 완성된 이야기로 만들어주세요.
+        2. 아기의 행동에 대한 부모의 감정과 생각을 풍부하게 묘사해주세요.
+        3. 따뜻하고, 부드럽고, 사랑이 넘치는 문체를 사용해주세요.
+        4. 결과물은 HTML 형식으로, 제목은 <h2> 태그로, 각 문단은 <p> 태그로 감싸주세요. 문단 사이에는 <br>을 넣어주세요.
+
+        --- 아기 기록 ---
+        ${entriesText}
+        --- 종료 ---
+    `;
 }
 
-// POST 요청을 처리하는 핸들러
-export async function onRequestPost({ request }) {
-    try {
-        // 요청 본문에서 JSON 데이터를 파싱합니다.
-        const { entries } = await request.json();
+// Cloudflare Pages의 POST 요청을 처리하는 기본 핸들러
+export async function onRequestPost({ request, env }) {
+    // 1. 환경 변수에서 API 키를 안전하게 불러오기
+    const apiKey = env.GEMINI_API_KEY;
+    if (!apiKey) {
+        return new Response(JSON.stringify({ error: 'AI API 키가 설정되지 않았습니다.' }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+        });
+    }
 
+    try {
+        // 2. 프론트엔드에서 보낸 기록 데이터 받기
+        const { entries } = await request.json();
         if (!entries || entries.length === 0) {
             return new Response(JSON.stringify({ error: '에세이를 생성할 기록이 없습니다.' }), {
                 status: 400,
@@ -34,16 +54,41 @@ export async function onRequestPost({ request }) {
             });
         }
 
-        // Mock 에세이를 생성합니다.
-        const essay = generateMockEssayFromServer(entries);
+        // 3. AI에게 보낼 프롬프트 생성
+        const prompt = createPrompt(entries);
 
-        // 생성된 에세이를 JSON 형태로 응답합니다.
+        // 4. Google Gemini API 호출
+        const apiResponse = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: prompt }]
+                }]
+            })
+        });
+
+        if (!apiResponse.ok) {
+            const errorBody = await apiResponse.text();
+            console.error('Google AI API 오류:', errorBody);
+            throw new Error(`AI 서비스에서 오류가 발생했습니다. (상태: ${apiResponse.status})`);
+        }
+
+        const data = await apiResponse.json();
+
+        // 5. AI 응답에서 에세이 텍스트 추출 및 클라이언트에 전달
+        // Gemini의 응답 구조에 따라 텍스트를 추출합니다.
+        const essay = data.candidates[0].content.parts[0].text;
+
         return new Response(JSON.stringify({ essay }), {
             headers: { 'Content-Type': 'application/json' },
         });
 
     } catch (error) {
-        return new Response(JSON.stringify({ error: `에세이 생성 중 오류가 발생했습니다: ${error.message}` }), {
+        console.error('에세이 생성 중 오류 발생:', error);
+        return new Response(JSON.stringify({ error: `서버 내부 오류: ${error.message}` }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
         });
