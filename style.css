@@ -1,383 +1,301 @@
-/* === Babily-Inspired Design Overhaul: Cute & Friendly (Corrected) === */
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&display=swap');
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+@import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap');
 
 :root {
-    /* Color Palette - Pastel & Soft */
-    --primary-color: #ffafcc; /* Soft Pink */
-    --primary-glow: rgba(255, 175, 204, 0.5);
-    --secondary-color: #a2d2ff; /* Sky Blue */
-    --accent-color: #fcf6bd; /* Soft Yellow */
-    --bg-color: #fdf5f7; /* Very light pinkish white */
-    --surface-color: #ffffff;
-    --text-primary: #5c4742;
-    --text-secondary: #a38c85;
-    --border-color: #ffe0e9;
+    --bg-color: #fde2e4; 
+    --container-bg: #fff;
+    --primary-color: #dfe7fd;
+    --secondary-color: #fcf6bd;
+    --accent-color: #e2f0d9;
+    --text-color: #333;
+    --button-bg: #dfe7fd;
+    --button-hover-bg: #c8d6fb;
+    --font-family: 'Gaegu', cursive;
+}
 
-    /* Typography */
-    --font-family-display: 'Nunito', 'Pretendard', sans-serif;
-    --font-family-body: 'Pretendard', sans-serif;
-
-    /* Effects */
-    --shadow-soft: 0px 4px 10px rgba(188, 149, 158, 0.15);
-    --shadow-dreamy: 0px 8px 25px rgba(188, 149, 158, 0.15);
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    font-family: var(--font-family-body);
-    margin: 0;
-    background-color: var(--bg-color);
-    background-image: linear-gradient(175deg, #ffffff 0%, #fff0f5 100%);
-    color: var(--text-primary);
+    font-family: var(--font-family);
+    background: linear-gradient(135deg, var(--bg-color), var(--primary-color));
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    color: var(--text-color);
 }
 
-#app {
+#app-container {
     width: 100%;
-    max-width: 420px;
-    margin: 2rem;
-    position: relative; 
+    max-width: 450px;
+    height: 95vh;
+    max-height: 850px;
+    background: var(--container-bg);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .screen {
-    background-color: var(--surface-color);
-    border-radius: 32px; /* Much rounder */
-    box-shadow: var(--shadow-dreamy);
-    border: 1px solid rgba(255,255,255,0.8);
-    overflow: hidden;
-    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    width: 100%;
+    height: 100%;
+    padding: 2rem;
 }
 
 .hidden {
-    display: none !important;
+    display: none;
 }
 
-/* Login Screen */
-.login-container {
-    padding: 3rem 2.5rem;
+/* --- Auth Screen --- */
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
     text-align: center;
 }
 
-.login-container h1 {
-    font-family: var(--font-family-display);
-    font-size: 2.8rem;
-    font-weight: 900;
+.auth-container h1 {
+    font-size: 2.5rem;
     color: var(--primary-color);
     margin-bottom: 1rem;
 }
 
-.login-container p {
-    margin-bottom: 2.5rem;
-    color: var(--text-secondary);
+.auth-container p {
+    margin-bottom: 2rem;
     font-size: 1.1rem;
-    line-height: 1.6;
 }
 
-#login-form .input-group {
-    text-align: left;
-    margin-bottom: 1.5rem;
-}
-
-#login-form label {
-    display: block;
-    margin-bottom: 0.75rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    font-family: var(--font-family-display);
-}
-
-#login-form input {
+.input-group {
+    margin-bottom: 1rem;
     width: 100%;
-    padding: 1rem 1.2rem;
-    border: 1px solid var(--border-color);
-    border-radius: 16px; /* rounder */
+}
+
+input[type="email"], input[type="password"], input[type="date"] {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    border: 2px solid var(--primary-color);
+    font-family: var(--font-family);
     font-size: 1rem;
-    box-sizing: border-box;
-    background-color: var(--bg-color);
-    color: var(--text-primary);
-    transition: all 0.2s ease-in-out;
 }
 
-#login-form input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    background-color: var(--surface-color);
-    box-shadow: 0 0 0 4px var(--primary-glow);
+.auth-toggle {
+    margin-top: 1.5rem;
+    cursor: pointer;
+    color: var(--primary-color);
+    font-weight: 700;
 }
 
-/* Main Screen Header */
+/* --- Main Screen --- */
+#main-screen {
+    display: flex;
+    flex-direction: column;
+}
+
 header {
-    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-    color: white;
-    padding: 1.5rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--primary-color);
 }
 
 .profile-greeting {
     display: flex;
     align-items: center;
+    gap: 0.8rem;
     font-size: 1.2rem;
-    font-weight: 700;
-    font-family: var(--font-family-display);
 }
 
 .profile-picture {
-    width: 52px;
-    height: 52px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    border: 3px solid white;
-    margin-right: 1rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    background-color: #fff; /* For transparent avatar parts */
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+}
+
+#d-day-counter {
+    font-size: 1rem;
+    font-weight: 700;
+    background-color: var(--accent-color);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
 }
 
 main {
-    padding: 1.5rem;
+    flex-grow: 1;
+    overflow-y: auto;
 }
 
-/* Form Elements */
-#entry-form label {
-    display: block;
-    margin-bottom: 0.75rem;
-    font-weight: 600;
-    font-family: var(--font-family-display);
-    color: var(--text-primary);
+/* --- Tabs --- */
+.tab-nav {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
 }
 
-#entry-form input, #entry-form textarea {
-    width: 100%;
-    padding: 1rem 1.2rem;
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    font-size: 1rem;
-    box-sizing: border-box;
-    background-color: #fff;
-    color: var(--text-primary);
-    transition: all 0.2s ease-in-out;
+.tab-button {
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    background: none;
+    border: 2px solid transparent;
+    font-family: var(--font-family);
+    font-size: 1.1rem;
+    cursor: pointer;
 }
 
-#entry-form input:focus, #entry-form textarea:focus {
-    outline: none;
+.tab-button.active {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px var(--primary-glow);
+    background-color: #f0f4ff;
 }
 
-#entry-form textarea {
-    resize: vertical;
-    min-height: 140px;
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
 }
 
-#entry-form .form-group {
+
+/* --- Entry Form & Container --- */
+#entry-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     margin-bottom: 1.5rem;
 }
 
-/* Generic Button Styles */
-.button {
+textarea {
     width: 100%;
-    padding: 1.2rem;
-    border: none;
-    border-radius: 99px; /* pill shape */
-    font-size: 1.2rem;
-    font-weight: 700;
-    font-family: var(--font-family-display);
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.button-primary {
-    background-color: var(--primary-color);
-    color: white;
-    box-shadow: 0 4px 15px var(--primary-glow);
-}
-
-.button-primary:hover, .button-primary:focus {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 8px 25px var(--primary-glow);
-}
-
-.button-primary:active {
-    transform: translateY(0) scale(1);
-}
-
-/* Applying button styles to specific classes */
-.login-button, .submit-button, .action-button, #final-save-button {
-    /* These classes will now inherit the .button and .button-primary look and feel */
-    width: 100%;
-    padding: 1.2rem;
-    border: none;
-    border-radius: 99px;
-    font-size: 1.2rem;
-    font-weight: 700;
-    font-family: var(--font-family-display);
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-    background-color: var(--primary-color);
-    color: white;
-    box-shadow: 0 4px 15px var(--primary-glow);
-}
-
-.login-button:hover, .submit-button:hover, .action-button:hover, #final-save-button:hover,
-.login-button:focus, .submit-button:focus, .action-button:focus, #final-save-button:focus {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 8px 25px var(--primary-glow);
-}
-
-.login-button:active, .submit-button:active, .action-button:active, #final-save-button:active {
-    transform: translateY(0) scale(1);
-}
-
-/* Add margin back to the necessary buttons */
-.action-button, .submit-button {
-    margin-bottom: 1.5rem;
-}
-
-
-/* Saved Entries */
-#entries-container {
-    margin-top: 2rem;
-    padding: 0 0.5rem;
-}
-
-.entry {
-    background-color: var(--surface-color);
-    border-radius: 24px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: var(--shadow-soft);
-    border: 1px solid transparent;
-    transition: all 0.2s ease-in-out;
-    border-left: 5px solid var(--secondary-color);
-}
-
-.entry:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-dreamy);
-    border-color: var(--border-color);
-}
-
-.entry h3 {
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    border: 2px solid var(--primary-color);
+    font-family: var(--font-family);
     font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    margin-top: 0;
-    margin-bottom: 1rem;
-    font-family: var(--font-family-body);
+    resize: vertical;
+    min-height: 80px;
 }
 
-.entry p {
-    line-height: 1.7;
-    font-family: var(--font-family-body);
+#entries-container, #essays-container {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-.entry img {
+/* --- Buttons --- */
+.button, button {
+    padding: 0.8rem 1.2rem;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--button-bg);
+    color: var(--text-color);
+    font-family: var(--font-family);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.button:hover, button:hover {
+    background-color: var(--button-hover-bg);
+}
+
+.button.button-primary {
     width: 100%;
-    border-radius: 16px;
-    margin-bottom: 1rem;
 }
 
-/* Modal */
+.submit-button, .action-button {
+    width: 100%;
+}
+
+
+/* --- Modal --- */
 .modal {
     position: fixed;
-    z-index: 1000;
-    left: 0; top: 0; width: 100%; height: 100%;
-    background-color: rgba(255, 245, 248, 0.7);
-    backdrop-filter: blur(10px);
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.4);
     display: flex;
     justify-content: center;
     align-items: center;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.4s ease, visibility 0.4s ease;
-}
-
-.modal:not(.hidden) {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
+    z-index: 100;
 }
 
 .modal-content {
-    background-color: var(--surface-color);
-    padding: 2.5rem;
-    border-radius: 32px;
-    box-shadow: var(--shadow-dreamy);
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
     width: 90%;
-    max-width: 550px;
-    transform: scale(0.9);
-    opacity: 0;
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    max-width: 500px;
     position: relative;
-}
-
-.modal:not(.hidden) .modal-content {
-    transform: scale(1);
-    opacity: 1;
 }
 
 .close-button {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 36px;
-    height: 36px;
-    background: var(--bg-color);
-    border-radius: 50%;
-    color: var(--text-secondary);
-    font-size: 24px;
-    font-weight: 600;
+    top: 1rem; right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
     cursor: pointer;
+}
+
+/* Profile Modal Specifics */
+.profile-editor {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    border: 1px solid var(--border-color);
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
-.close-button:hover {
-    background: var(--primary-color);
-    color: white;
-    transform: rotate(90deg) scale(1.1);
-}
-
-#essay-output {
-    margin-top: 1.5rem;
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    min-height: 250px;
-    max-height: 60vh;
-    overflow-y: auto;
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    background-color: var(--bg-color);
-    line-height: 1.8;
-    white-space: pre-wrap;
-    font-family: var(--font-family-body);
-}
-
-#photo-preview {
-    width: 100%;
-    max-height: 250px;
-    margin-top: 1rem;
-    border-radius: 16px;
+#profile-modal-picture {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
     object-fit: cover;
 }
 
-/* Responsive */
-@media (max-width: 480px) {
-    #app {
-        margin: 1rem;
-    }
-    .login-container, main, .modal-content {
-        padding: 2rem 1.5rem;
-    }
-    .login-container h1 {
-        font-size: 2.4rem;
-    }
+#default-avatars {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+}
+
+.avatar-option {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.avatar-option:hover, .avatar-option.selected {
+    border-color: var(--primary-color);
+}
+
+.baby-info-editor {
+    margin-top: 1rem;
+}
+
+.baby-info-editor input {
+    width: 100%;
+}
+
+#save-profile-button {
+    width: 100%;
+    margin-top: 1.5rem;
 }

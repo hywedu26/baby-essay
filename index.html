@@ -1,89 +1,121 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>아기 성장 에세이</title>
-    <link rel="stylesheet" href="style.css?v=1716184000">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app">
-        <section id="login-screen" class="screen">
-            <div class="login-container">
+    <div id="app-container">
+        <!-- 1. 로그인/회원가입 화면 -->
+        <section id="auth-screen" class="screen">
+            <div class="auth-container">
                 <h1>아기 성장 에세이</h1>
                 <p>소중한 순간들을 기록하고, AI와 함께 특별한 이야기로 만들어보세요.</p>
                 <form id="login-form">
                     <div class="input-group">
-                        <label for="username">아이디</label>
-                        <input type="text" id="username" name="username" required placeholder="사용자 아이디를 입력하세요">
+                        <input type="email" id="email" name="email" required placeholder="이메일을 입력하세요">
                     </div>
                     <div class="input-group">
-                        <label for="password">비밀번호</label>
                         <input type="password" id="password" name="password" required placeholder="비밀번호를 입력하세요">
                     </div>
-                    <button type="submit" class="login-button button button-primary">로그인</button>
+                    <button type="submit" id="login-button" class="button button-primary">로그인</button>
+                    <p class="auth-toggle">계정이 없으신가요? <span id="show-signup">회원가입</span></p>
+                </form>
+                <form id="signup-form" class="hidden">
+                    <div class="input-group">
+                        <input type="email" id="signup-email" name="signup-email" required placeholder="이메일을 입력하세요">
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="signup-password" name="signup-password" required placeholder="비밀번호를 설정하세요">
+                    </div>
+                    <button type="submit" id="signup-button" class="button button-primary">회원가입</button>
+                    <p class="auth-toggle">이미 계정이 있으신가요? <span id="show-login">로그인</span></p>
                 </form>
             </div>
         </section>
 
+        <!-- 2. 메인 화면 -->
         <section id="main-screen" class="screen hidden">
             <header>
                 <div class="profile-greeting">
-                    <img src="" alt="프로필 사진" class="profile-picture">
-                    <span><span id="user-id"></span>님, 반가워요!</span>
+                    <img src="https://via.placeholder.com/50" alt="프로필 사진" class="profile-picture">
+                    <span><span id="user-display-name"></span>님, 반가워요!</span>
+                </div>
+                <div id="d-day-counter"></div>
+                <div class="header-actions">
+                    <button id="profile-button" class="button">프로필 관리</button>
+                    <button id="logout-button" class="button">로그아웃</button>
                 </div>
             </header>
             <main>
-                <!-- 탭 네비게이션 추가 -->
                 <div class="tab-nav">
                     <button class="tab-button active" data-tab="entries">육아 기록</button>
                     <button class="tab-button" data-tab="essays">저장된 에세이</button>
                 </div>
 
-                <!-- 육아 기록 탭 콘텐츠 -->
                 <div id="entries-tab" class="tab-content active">
-                    <div id="entry-form-container">
-                        <form id="entry-form">
-                            <div class="form-group">
-                                <label for="entry-date">날짜</label>
-                                <input type="date" id="entry-date" name="entry-date" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="entry-text">오늘의 기록</label>
-                                <textarea id="entry-text" name="entry-text" rows="5" placeholder="어떤 특별한 순간이 있었나요?"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="entry-photo">사진 추가</label>
-                                <input type="file" id="entry-photo" name="entry-photo" accept="image/*">
-                                <img id="photo-preview" src="#" alt="사진 미리보기" class="hidden">
-                            </div>
-                            <button type="submit" class="submit-button">기록 저장하기</button>
-                        </form>
-                    </div>
+                    <form id="entry-form">
+                        <div class="form-group"><input type="date" id="entry-date" required></div>
+                        <div class="form-group"><textarea id="entry-text" placeholder="어떤 특별한 순간이 있었나요?"></textarea></div>
+                        <div class="form-group"><input type="file" id="entry-photo" accept="image/*"></div>
+                        <button type="submit" class="submit-button">기록 저장하기</button>
+                    </form>
                     <button id="generate-essay-button" class="action-button">AI 에세이 만들기</button>
                     <div id="entries-container"></div>
                 </div>
 
-                <!-- 저장된 에세이 탭 콘텐츠 -->
                 <div id="essays-tab" class="tab-content">
-                    <div id="essays-container">
-                        <!-- 저장된 에세이가 여기에 표시됩니다. -->
-                    </div>
+                    <div id="essays-container"></div>
                 </div>
             </main>
         </section>
 
-        <!-- Essay Generation Modal -->
+        <!-- 3. 프로필 관리 모달 -->
+        <div id="profile-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>프로필 관리</h2>
+                <div class="profile-editor">
+                    <div class="current-profile">
+                        <img src="https://via.placeholder.com/100" alt="프로필 사진" id="profile-modal-picture">
+                    </div>
+                    <div class="profile-options">
+                        <label>프로필 사진 변경</label>
+                        <input type="file" id="photo-upload" accept="image/*">
+                        <p>또는, 아래 이미지에서 선택하세요:</p>
+                        <div id="default-avatars">
+                            <!-- 기본 아바타 이미지들이 여기에 동적으로 추가됩니다. -->
+                        </div>
+                    </div>
+                </div>
+                <div class="baby-info-editor">
+                    <label for="baby-birthdate">아기 생년월일</label>
+                    <input type="date" id="baby-birthdate">
+                </div>
+                <button id="save-profile-button" class="button button-primary">저장하기</button>
+            </div>
+        </div>
+        
+        <!-- 4. 에세이 생성 모달 -->
         <div id="essay-modal" class="modal hidden">
             <div class="modal-content">
                 <span class="close-button">&times;</span>
                 <h2>AI 육아 에세이</h2>
-                <div id="essay-output"><p>AI가 아가의 소중한 기록으로 예쁜 글을 만들고 있어요. 잠시만 기다려주세요...</p></div>
+                <div id="essay-output"></div>
                 <button id="final-save-button" class="button button-primary">이 에세이 저장하기</button>
             </div>
         </div>
     </div>
 
-    <script src="main.js?v=1716184000"></script>
+    <!-- Firebase SDK - 반드시 main.js 앞에 와야 합니다. -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+
+    <script src="main.js"></script>
 </body>
 </html>

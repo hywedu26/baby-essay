@@ -1,255 +1,428 @@
+
 document.addEventListener('DOMContentLoaded', () => {
-    // 화면 및 컨테이너 요소
-    const loginScreen = document.getElementById('login-screen');
+    // --- Firebase 설정 --- 
+    const firebaseConfig = {
+      apiKey: "AIzaSyADKPqaFUa83F0uRwb0qcN_6ldVz0tmcJQ",
+      authDomain: "babyessay-2ea30.firebaseapp.com",
+      projectId: "babyessay-2ea30",
+      storageBucket: "babyessay-2ea30.appspot.com",
+      messagingSenderId: "638810242116",
+      appId: "1:638810242116:web:4e699f861c759798719011"
+    };
+
+    // Firebase 앱 초기화
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // 전역 상태 변수
+    let currentUser = null;
+    let userProfile = {};
+
+    // --- DOM 요소 참조 --- //
+    const appContainer = document.getElementById('app-container');
+    const authScreen = document.getElementById('auth-screen');
     const mainScreen = document.getElementById('main-screen');
-    const entriesTab = document.getElementById('entries-tab');
-    const essaysTab = document.getElementById('essays-tab');
+
+    // 인증 관련
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const loginButton = document.getElementById('login-button');
+    const signupButton = document.getElementById('signup-button');
+    const showSignup = document.getElementById('show-signup');
+    const showLogin = document.getElementById('show-login');
+    const logoutButton = document.getElementById('logout-button');
+
+    // 메인 화면 헤더
+    const profilePicture = document.querySelector('.profile-picture');
+    const userDisplayName = document.getElementById('user-display-name');
+    const dDayCounter = document.getElementById('d-day-counter');
+    const profileButton = document.getElementById('profile-button');
+
+    // 프로필 관리 모달
+    const profileModal = document.getElementById('profile-modal');
+    const closeModalButtons = document.querySelectorAll('.close-button');
+    const profileModalPicture = document.getElementById('profile-modal-picture');
+    const photoUpload = document.getElementById('photo-upload');
+    const defaultAvatarsContainer = document.getElementById('default-avatars');
+    const babyBirthdateInput = document.getElementById('baby-birthdate');
+    const saveProfileButton = document.getElementById('save-profile-button');
+    let selectedAvatarUrl = null;
+
+    // 탭
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    // 기록 및 에세이
+    const entryForm = document.getElementById('entry-form');
     const entriesContainer = document.getElementById('entries-container');
     const essaysContainer = document.getElementById('essays-container');
-
-    // 폼 및 버튼 요소
-    const loginForm = document.getElementById('login-form');
-    const entryForm = document.getElementById('entry-form');
     const generateEssayButton = document.getElementById('generate-essay-button');
-    const finalSaveButton = document.getElementById('final-save-button');
-    const tabButtons = document.querySelectorAll('.tab-button');
-    
-    // 모달 요소
     const essayModal = document.getElementById('essay-modal');
-    const closeButton = document.querySelector('.close-button');
     const essayOutput = document.getElementById('essay-output');
+    const finalSaveButton = document.getElementById('final-save-button');
 
-    // 기타 UI 요소
-    const userIdSpan = document.getElementById('user-id');
-    const profilePicture = document.querySelector('.profile-picture');
-    const entryDate = document.getElementById('entry-date');
-    const entryPhoto = document.getElementById('entry-photo');
-    const photoPreview = document.getElementById('photo-preview');
 
-    // 데이터 저장을 위한 키
-    const ENTRIES_KEY = 'baby-entries';
-    const ESSAYS_KEY = 'baby-essays';
+    // --- 인증 로직 --- //
 
-    // --- 데이터 관리 --- //
-    const getFromStorage = (key) => JSON.parse(localStorage.getItem(key)) || [];
-    const saveToStorage = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+    // 회원가입 처리
+    signupForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = signupForm['signup-email'].value;
+        const password = signupForm['signup-password'].value;
 
-    // --- 초기화 --- //
-    function initialize() {
-        entryDate.valueAsDate = new Date();
-        renderEntries();
-        renderEssays();
+        auth.createUserWithEmailAndPassword(email, password)
+            .then(userCredential => {
+                // 회원가입 성공 시, 기본 프로필 생성
+                const user = userCredential.user;
+                const defaultProfile = {
+                    displayName: email.split('@')[0], // 이메일 앞부분을 기본 이름으로
+                    photoURL: `https://api.dicebear.com/8.x/miniavs/svg?seed=${user.uid}`,
+                    babyBirthdate: '',
+                };
+                db.collection('users').doc(user.uid).set(defaultProfile);
+            })
+            .catch(error => alert(`회원가입 실패: ${error.message}`))
+    });
 
-        // 자동 로그인 확인
-        const savedUser = localStorage.getItem('baby-app-user');
-        if (savedUser) {
-            showMainScreen(savedUser);
+    // 로그인 처리
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = loginForm['email'].value;
+        const password = loginForm['password'].value;
+
+        auth.signInWithEmailAndPassword(email, password)
+            .catch(error => alert(`로그인 실패: ${error.message}`));
+    });
+
+    // 로그아웃 처리
+    logoutButton.addEventListener('click', () => {
+        auth.signOut();
+    });
+
+    // 인증 상태 감지
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            currentUser = user;
+            loadUserProfile(user.uid);
+            authScreen.classList.add('hidden');
+            mainScreen.classList.remove('hidden');
+        } else {
+            currentUser = null;
+            userProfile = {};
+            authScreen.classList.remove('hidden');
+            mainScreen.classList.add('hidden');
+            entriesContainer.innerHTML = '';
+            essaysContainer.innerHTML = '';
+        }
+    });
+
+    // --- UI 전환 (로그인/회원가입) --- //
+    showSignup.addEventListener('click', () => {
+        loginForm.classList.add('hidden');
+        signupForm.classList.remove('hidden');
+    });
+
+    showLogin.addEventListener('click', () => {
+        signupForm.classList.add('hidden');
+        loginForm.classList.remove('hidden');
+    });
+
+    // --- 프로필 관리 --- //
+    function loadUserProfile(uid) {
+        const docRef = db.collection('users').doc(uid);
+        docRef.onSnapshot(doc => {
+            if (doc.exists) {
+                userProfile = doc.data();
+                updateUIWithProfile(userProfile);
+                loadEntries(); // 프로필 로드 후 기록 로드
+                loadEssays();  // 프로필 로드 후 에세이 로드
+            } else {
+                console.log("User profile does not exist!");
+            }
+        });
+    }
+
+    function updateUIWithProfile(profile) {
+        userDisplayName.textContent = profile.displayName || '사용자';
+        profilePicture.src = profile.photoURL || 'https://via.placeholder.com/50';
+        
+        if (profile.babyBirthdate) {
+            const dDay = calculateDday(profile.babyBirthdate);
+            dDayCounter.textContent = `D+${dDay}`;
+            dDayCounter.classList.remove('hidden');
+        } else {
+            dDayCounter.classList.add('hidden');
         }
     }
 
-    // --- 화면 전환 --- //
-    function showMainScreen(username) {
-        loginScreen.classList.add('hidden');
-        mainScreen.classList.remove('hidden');
-        userIdSpan.textContent = username;
-        profilePicture.src = `https://api.dicebear.com/8.x/miniavs/svg?seed=${username}`;
-        localStorage.setItem('baby-app-user', username);
+    function calculateDday(birthdateString) {
+        const birthDate = new Date(birthdateString);
+        const today = new Date();
+        const differenceInTime = today.getTime() - birthDate.getTime();
+        const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
+        return differenceInDays + 1; // 태어난 날을 1일로 계산
     }
+
+    // 프로필 모달 열기
+    profileButton.addEventListener('click', () => {
+        // 모달 열 때 현재 프로필 정보로 채우기
+        profileModalPicture.src = userProfile.photoURL || 'https://via.placeholder.com/100';
+        babyBirthdateInput.value = userProfile.babyBirthdate || '';
+        loadDefaultAvatars();
+        profileModal.classList.remove('hidden');
+    });
+
+    // 기본 아바타 로드
+    function loadDefaultAvatars() {
+        defaultAvatarsContainer.innerHTML = '';
+        selectedAvatarUrl = null;
+        const avatars = ['avatar1', 'avatar2', 'avatar3', 'avatar4', 'avatar5'];
+        avatars.forEach(seed => {
+            const img = document.createElement('img');
+            img.src = `https://api.dicebear.com/8.x/miniavs/svg?seed=${seed}`;
+            img.classList.add('avatar-option');
+            img.addEventListener('click', () => {
+                document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+                img.classList.add('selected');
+                selectedAvatarUrl = img.src;
+                profileModalPicture.src = img.src; // 미리보기 업데이트
+                photoUpload.value = ''; // 파일 업로드 선택 해제
+            });
+            defaultAvatarsContainer.appendChild(img);
+        });
+    }
+    
+    // 프로필 사진 파일 선택 시
+    photoUpload.addEventListener('change', (e) => {
+         const file = e.target.files[0];
+         if(file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                profileModalPicture.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+            selectedAvatarUrl = null; // 기본 아바타 선택 해제
+            document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+         }
+    });
+
+    // 프로필 저장
+    saveProfileButton.addEventListener('click', async () => {
+        const newBirthdate = babyBirthdateInput.value;
+        const uploadedFile = photoUpload.files[0];
+        let newPhotoURL = userProfile.photoURL;
+
+        saveProfileButton.textContent = '저장 중...';
+        saveProfileButton.disabled = true;
+
+        try {
+            // 1. 사진 처리 (업로드 또는 선택)
+            if (uploadedFile) {
+                const filePath = `profile_images/${currentUser.uid}/${uploadedFile.name}`;
+                const fileRef = storage.ref(filePath);
+                const snapshot = await fileRef.put(uploadedFile);
+                newPhotoURL = await snapshot.ref.getDownloadURL();
+            } else if (selectedAvatarUrl) {
+                newPhotoURL = selectedAvatarUrl;
+            }
+
+            // 2. Firestore에 업데이트
+            await db.collection('users').doc(currentUser.uid).update({
+                photoURL: newPhotoURL,
+                babyBirthdate: newBirthdate
+            });
+
+            alert('프로필이 저장되었습니다!');
+            profileModal.classList.add('hidden');
+
+        } catch (error) {
+            alert(`프로필 저장 실패: ${error.message}`);
+            console.error(error);
+        } finally {
+            saveProfileButton.textContent = '저장하기';
+            saveProfileButton.disabled = false;
+        }
+    });
 
     // --- 탭 기능 --- //
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
-            const tabName = button.dataset.tab;
-
+            const tab = button.dataset.tab;
             tabButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
 
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.id === `${tabName}-tab` 
-                    ? content.classList.add('active') 
-                    : content.classList.remove('active');
+            tabContents.forEach(content => {
+                if (content.id === `${tab}-tab`) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
             });
         });
     });
-
-    // --- 육아 기록 관리 --- //
-    function renderEntries() {
-        const entries = getFromStorage(ENTRIES_KEY);
-        entriesContainer.innerHTML = '';
-        if (entries.length === 0) {
-            entriesContainer.innerHTML = '<p class="empty-message">아직 작성된 기록이 없어요. 첫 기록을 남겨보세요!</p>';
-        }
-        entries.sort((a, b) => new Date(b.date) - new Date(a.date));
-        entries.forEach(entry => addEntryToDOM(entry));
+    
+    // --- 기록 관리 (Firestore) --- //
+    function getEntriesRef() {
+        return db.collection('users').doc(currentUser.uid).collection('entries');
     }
 
-    function addEntryToDOM(entry) {
-        const entryElement = document.createElement('div');
-        entryElement.classList.add('entry');
-        entryElement.dataset.id = entry.id;
-
-        const textParagraph = document.createElement('p');
-        textParagraph.innerHTML = entry.text.replace(/\n/g, '<br>');
-
-        entryElement.innerHTML = `
-            <div class="entry-header">
-                <h3>${new Date(entry.date).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</h3>
-                <button class="delete-button entry-delete-button" data-id="${entry.id}">삭제</button>
-            </div>
-            ${entry.photo ? `<img src="${entry.photo}" alt="기록 사진">` : ''}
-        `;
-        entryElement.appendChild(textParagraph);
-        entriesContainer.appendChild(entryElement);
-    }
-
-    function deleteEntry(id) {
-        let entries = getFromStorage(ENTRIES_KEY);
-        entries = entries.filter(entry => entry.id !== id);
-        saveToStorage(ENTRIES_KEY, entries);
-        renderEntries();
-    }
-
-    // --- 에세이 관리 --- //
-    function renderEssays() {
-        const essays = getFromStorage(ESSAYS_KEY);
-        essaysContainer.innerHTML = '';
-        if (essays.length === 0) {
-            essaysContainer.innerHTML = '<p class="empty-message">아직 저장된 에세이가 없어요. AI와 함께 첫 에세이를 만들어보세요!</p>';
-            return;
-        }
-        essays.sort((a, b) => b.id - a.id);
-        essays.forEach(essay => {
-            const essayCard = document.createElement('div');
-            essayCard.classList.add('essay-card');
-            essayCard.innerHTML = `
-                <div class="essay-header">
-                    <h4>${new Date(essay.date).toLocaleString('ko-KR')}에 생성됨</h4>
-                    <button class="delete-button essay-delete-button" data-id="${essay.id}">삭제</button>
-                </div>
-                <div class="essay-content">${essay.content}</div>
-            `;
-            essaysContainer.appendChild(essayCard);
+    function loadEntries() {
+        if (!currentUser) return;
+        getEntriesRef().orderBy('date', 'desc').onSnapshot(snapshot => {
+            entriesContainer.innerHTML = '';
+            if (snapshot.empty) {
+                entriesContainer.innerHTML = '<p>아직 기록이 없어요.</p>';
+                return;
+            }
+            snapshot.forEach(doc => {
+                const entry = { id: doc.id, ...doc.data() };
+                addEntryToDOM(entry);
+            });
         });
     }
 
-    function saveEssay() {
-        const content = essayOutput.innerHTML;
-        if (content.includes('만들고 있어요') || content.includes('실패했어요')) {
-            alert('에세이 내용이 올바르지 않아 저장할 수 없습니다.');
-            return;
-        }
+    entryForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const date = entryForm.querySelector('#entry-date').value;
+        const text = entryForm.querySelector('#entry-text').value;
+        const photoFile = entryForm.querySelector('#entry-photo').files[0];
         
-        let essays = getFromStorage(ESSAYS_KEY);
-        const newEssay = {
-            id: Date.now(),
-            date: new Date().toISOString(),
-            content: content
-        };
-        essays.push(newEssay);
-        saveToStorage(ESSAYS_KEY, essays);
-        alert('에세이가 성공적으로 저장되었습니다!');
-        renderEssays();
-        essayModal.classList.add('hidden');
-    }
+        if (!date || !text) return alert('날짜와 내용을 입력하세요.');
 
-    function deleteEssay(id) {
-        let essays = getFromStorage(ESSAYS_KEY);
-        essays = essays.filter(essay => essay.id !== id);
-        saveToStorage(ESSAYS_KEY, essays);
-        renderEssays();
-    }
-
-    // --- 이벤트 리스너 --- //
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        showMainScreen(e.target.username.value);
-    });
-
-    entryPhoto.addEventListener('change', () => {
-        const file = entryPhoto.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                photoPreview.src = e.target.result;
-                photoPreview.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
+        let photoURL = null;
+        if (photoFile) {
+            const filePath = `entry_photos/${currentUser.uid}/${Date.now()}_${photoFile.name}`;
+            const fileRef = storage.ref(filePath);
+            const snapshot = await fileRef.put(photoFile);
+            photoURL = await snapshot.ref.getDownloadURL();
         }
-    });
 
-    entryForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const date = entryDate.value;
-        const text = e.target['entry-text'].value;
-        if (!date || !text) {
-            alert('날짜와 기록을 모두 입력해주세요.');
-            return;
-        }
-        let entries = getFromStorage(ENTRIES_KEY);
-        const newEntry = {
-            id: Date.now(),
-            date: date,
-            text: text,
-            photo: photoPreview.classList.contains('hidden') ? null : photoPreview.src
-        };
-        entries.push(newEntry);
-        saveToStorage(ENTRIES_KEY, entries);
-        renderEntries();
-
+        await getEntriesRef().add({
+            date,
+            text,
+            photoURL,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
         entryForm.reset();
-        photoPreview.classList.add('hidden');
-        photoPreview.src = '#';
-        entryDate.valueAsDate = new Date();
+    });
+
+    function addEntryToDOM(entry) {
+        const div = document.createElement('div');
+        div.className = 'entry';
+        div.innerHTML = `
+            <h3>${new Date(entry.date).toLocaleDateString()}</h3>
+            ${entry.photoURL ? `<img src="${entry.photoURL}" alt="기록 사진">` : ''}
+            <p>${entry.text.replace(/\n/g, '<br>')}</p>
+            <button class="delete-button" data-id="${entry.id}">삭제</button>
+        `;
+        entriesContainer.appendChild(div);
+    }
+
+    entriesContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-button')) {
+            const id = e.target.dataset.id;
+            if (confirm('정말 이 기록을 삭제하시겠어요?')) {
+                getEntriesRef().doc(id).delete();
+            }
+        }
     });
     
-    // 동적 생성 요소 이벤트 위임
-    document.addEventListener('click', (e) => {
-        if (e.target.matches('.entry-delete-button')) {
-            if (confirm('이 기록을 정말 삭제하시겠어요?')) {
-                deleteEntry(Number(e.target.dataset.id));
+    // --- 에세이 관리 (Firestore) --- //
+    function getEssaysRef() {
+        return db.collection('users').doc(currentUser.uid).collection('essays');
+    }
+    
+    async function loadEssays() {
+        if (!currentUser) return;
+        getEssaysRef().orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+            essaysContainer.innerHTML = '';
+            if (snapshot.empty) {
+                 essaysContainer.innerHTML = '<p>저장된 에세이가 없어요.</p>';
+                 return;
             }
-        }
-        if (e.target.matches('.essay-delete-button')) {
-            if (confirm('이 에세이를 정말 삭제하시겠어요?')) {
-                deleteEssay(Number(e.target.dataset.id));
+            snapshot.forEach(doc => {
+                const essay = { id: doc.id, ...doc.data() };
+                const div = document.createElement('div');
+                div.className = 'essay-card';
+                div.innerHTML = `
+                    <div class="essay-content">${essay.content}</div>
+                    <small>${new Date(essay.createdAt.toDate()).toLocaleString()}</small>
+                    <button class="delete-button" data-id="${essay.id}">삭제</button>
+                `;
+                essaysContainer.appendChild(div);
+            });
+        });
+    }
+    
+    finalSaveButton.addEventListener('click', () => {
+        const content = essayOutput.innerHTML;
+        getEssaysRef().add({
+            content,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+            alert('에세이가 저장되었습니다.');
+            essayModal.classList.add('hidden');
+        });
+    });
+    
+    essaysContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-button')) {
+            const id = e.target.dataset.id;
+            if (confirm('정말 이 에세이를 삭제하시겠어요?')) {
+                getEssaysRef().doc(id).delete();
             }
         }
     });
-
+    
+    // 에세이 생성 로직 (API 호출 부분은 기존과 유사)
     generateEssayButton.addEventListener('click', async () => {
-        const entries = getFromStorage(ENTRIES_KEY);
-        if (entries.length < 2) {
-            alert('AI 에세이를 생성하려면 최소 2개 이상의 기록이 필요합니다.');
-            return;
-        }
-        essayOutput.innerHTML = '<p>AI가 아가의 소중한 기록으로 예쁜 글을 만들고 있어요. 잠시만 기다려주세요...</p>';
-        essayModal.classList.remove('hidden');
-        
-        const entriesForAPI = entries.map(({ date, text }) => ({ date, text }));
-
-        try {
+       const snapshot = await getEntriesRef().get();
+       if(snapshot.empty || snapshot.size < 2) {
+           alert('AI 에세이를 만들려면 2개 이상의 기록이 필요해요.');
+           return;
+       }
+       
+       const entriesForAPI = snapshot.docs.map(doc => {
+           const { date, text } = doc.data();
+           return { date, text };
+       });
+       
+       essayOutput.innerHTML = '<p>AI가 글을 만들고 있어요...</p>';
+       essayModal.classList.remove('hidden');
+       
+       try {
+            // !! 중요 !!
+            // Cloud Function 또는 다른 백엔드 서비스를 호출하는 로직입니다.
+            // '/generate-essay' 엔드포인트가 Gemini API를 호출하도록 구현해야 합니다.
             const response = await fetch('/generate-essay', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ entries: entriesForAPI }),
             });
             const data = await response.json();
-            if (!response.ok) throw data;
+            if (!response.ok) throw new Error(data.error || 'Unknown error');
             essayOutput.innerHTML = data.essay;
         } catch (error) {
-            console.error('에세이 생성 실패:', error);
-            const errorMessage = error.error ? `${error.error} - ${error.details || ''}` : (error.message || JSON.stringify(error));
-            essayOutput.innerHTML = `<p style="color: red;">에세이 생성에 실패했어요. 네트워크 연결을 확인하거나 잠시 후 다시 시도해주세요.<br><br><strong>오류 상세:</strong> ${errorMessage}</p>`;
+            essayOutput.innerHTML = `<p style="color:red;">에세이 생성 실패: ${error.message}</p>`;
+            console.error(error);
         }
     });
 
-    closeButton.addEventListener('click', () => essayModal.classList.add('hidden'));
-    essayModal.addEventListener('click', (e) => {
-        if (e.target === essayModal) essayModal.classList.add('hidden');
+    // --- 모달 공통 로직 --- //
+    closeModalButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            btn.closest('.modal').classList.add('hidden');
+        });
     });
-    
-    finalSaveButton.addEventListener('click', saveEssay);
 
-    // --- 앱 시작 --- //
-    initialize();
+    // 모달 바깥 클릭 시 닫기
+    [profileModal, essayModal].forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+    });
 });
