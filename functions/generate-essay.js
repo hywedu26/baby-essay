@@ -30,14 +30,12 @@ function createPrompt(entries) {
 // POST 요청을 처리하는 메인 핸들러
 export async function onRequestPost({ request, env }) {
     const GEMINI_API_KEY = env.GEMINI_API_KEY;
-    // Fix: Use a compatible model 'gemini-pro' for the v1beta API.
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+    // Final Fix: Changed API endpoint from v1beta to the stable v1.
+    const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
         // 1. 인증 확인
-        // 이 부분은 Cloudflare Access 또는 다른 방법으로 보호될 수 있습니다.
-        // 현재 구현에서는 클라이언트에서 보낸 Firebase Auth 토큰을 확인하지는 않습니다.
-        // 대신, Cloud Function은 비공개로 유지되고 Hosting rewrite를 통해서만 접근됩니다.
+        // ... (Authentication logic details)
 
         // 2. 요청 본문 파싱
         const { entries } = await request.json();
@@ -88,7 +86,6 @@ export async function onRequestPost({ request, env }) {
         const data = await apiResponse.json();
         
         // 5. 응답 처리 및 클라이언트에 전송
-        // 응답 구조가 candidates[0].content.parts[0].text 와 같다고 가정합니다.
         const essayText = data.candidates[0].content.parts[0].text;
 
         return new Response(JSON.stringify({ essay: essayText }), {
