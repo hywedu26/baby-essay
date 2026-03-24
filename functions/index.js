@@ -5,9 +5,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 admin.initializeApp();
 
 // --- Gemini API 설정 ---
-// 주의: API 키를 코드에 직접 넣는 것은 위험합니다. 
-// 실제 앱에서는 환경 변수나 Secret Manager를 사용하세요.
-const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY"; // 여기에 실제 Gemini API 키를 넣어야 합니다.
+const GEMINI_API_KEY = "AIzaSyDHPHbd9HqzRhnc3bXe4WYMiDV4wkHZUnY";
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -16,7 +14,7 @@ exports.generateEssay = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   if (req.method === 'OPTIONS') {
       res.set('Access-Control-Allow-Methods', 'POST');
-      res.set('Access-Control-Allow-Headers', 'Content-Type');
+      res.set('Access-control-allow-headers', 'Content-Type');
       res.set('Access-Control-Max-Age', '3600');
       res.status(204).send('');
       return;
