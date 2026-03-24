@@ -29,9 +29,9 @@ function createPrompt(entries) {
 
 // POST 요청을 처리하는 메인 핸들러
 export async function onRequestPost({ request, env }) {
-    // 재배포 트리거: Cloudflare가 새로운 환경 변수를 사용하도록 강제합니다.
     const GEMINI_API_KEY = env.GEMINI_API_KEY;
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+    // Fix: Use a compatible model 'gemini-pro' for the v1beta API.
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
         // 1. 인증 확인
