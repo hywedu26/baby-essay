@@ -1,0 +1,25 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 사용자의 기본 프로필 정보
+    // 사용자는 자신의 프로필만 읽고 업데이트할 수 있습니다.
+    match /users/{userId} {
+      allow read, update: if request.auth != null && request.auth.uid == userId;
+      
+      // 사용자의 육아 기록 (entries)
+      // 사용자는 자신의 기록만 생성, 읽기, 삭제할 수 있습니다.
+      match /entries/{entryId} {
+        allow read, create, delete: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // 사용자의 저장된 에세이 (essays)
+      // 사용자는 자신의 에세이만 생성, 읽기, 삭제할 수 있습니다.
+      match /essays/{essayId} {
+        allow read, create, delete: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+}
