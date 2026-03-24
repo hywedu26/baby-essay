@@ -407,11 +407,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ entries: entriesForAPI }),
             });
             
-            // 응답이 JSON이 아닐 경우를 대비한 처리
             if (!response.ok) {
                  const errorText = await response.text();
                  console.error("Server response:", errorText);
-                 throw new Error(data.error || 'Cloud Function 호출에 실패했습니다.');
+                 // 수정된 부분: 'data' 대신 'errorText'를 사용합니다.
+                 throw new Error('Cloud Function 호출에 실패했습니다: ' + errorText);
             }
 
             const data = await response.json();
