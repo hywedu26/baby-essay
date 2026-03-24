@@ -30,12 +30,13 @@ function createPrompt(entries) {
 // POST 요청을 처리하는 메인 핸들러
 export async function onRequestPost({ request, env }) {
     const GEMINI_API_KEY = env.GEMINI_API_KEY;
-    // Final Fix: Changed API endpoint from v1beta to the stable v1.
-    const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+    // Last Attempt: Using the specific 'gemini-1.0-pro' model ID.
+    // If this fails, the issue is with the Google Cloud Project configuration (API not enabled).
+    const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
         // 1. 인증 확인
-        // ... (Authentication logic details)
+        // ...
 
         // 2. 요청 본문 파싱
         const { entries } = await request.json();
