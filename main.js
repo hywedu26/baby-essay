@@ -393,17 +393,30 @@ document.addEventListener('DOMContentLoaded', () => {
        essayModal.classList.remove('hidden');
        
        try {
-            // !! 중요 !!
-            // Cloud Function 또는 다른 백엔드 서비스를 호출하는 로직입니다.
-            // '/generate-essay' 엔드포인트가 Gemini API를 호출하도록 구현해야 합니다.
+            // !! 중요: 인증 토큰 가져오기 !!
+            if (!currentUser) throw new Error("로그인이 필요합니다.");
+            const idToken = await currentUser.getIdToken();
+
             const response = await fetch('/generate-essay', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    // !! 중요: 헤더에 인증 토큰 추가 !!
+                    'Authorization': `Bearer ${idToken}`
+                },
                 body: JSON.stringify({ entries: entriesForAPI }),
             });
+            
+            // 응답이 JSON이 아닐 경우를 대비한 처리
+            if (!response.ok) {
+                 const errorText = await response.text();
+                 console.error("Server response:", errorText);
+                 throw new Error(data.error || 'Cloud Function 호출에 실패했습니다.');
+            }
+
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Unknown error');
             essayOutput.innerHTML = data.essay;
+
         } catch (error) {
             essayOutput.innerHTML = `<p style="color:red;">에세이 생성 실패: ${error.message}</p>`;
             console.error(error);

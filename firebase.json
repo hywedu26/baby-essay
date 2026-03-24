@@ -4,5 +4,21 @@
   },
   "functions": {
     "source": "functions"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "firestore.rules",
+      "storage.rules",
+      "**/node_modules/**",
+      "**/.*"
+    ],
+    "rewrites": [
+      {
+        "source": "/generate-essay",
+        "function": "generateEssay"
+      }
+    ]
   }
 }
